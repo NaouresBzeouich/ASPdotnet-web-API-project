@@ -1,6 +1,14 @@
-﻿namespace Project_back_end.Data
+﻿using Microsoft.EntityFrameworkCore;
+using Project_back_end.Models; 
+
+namespace Project_back_end.Data
 {
-    public class BlogsAPIDbContext
+    public class BlogsAPIDbContext : DbContext
     {
+        public DbSet<Blog> Blogs { get; set; }
+        protected BlogsAPIDbContext(DbContextOptions options) : base(options)
+        {
+
+        }
     }
 }
