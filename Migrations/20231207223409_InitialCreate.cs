@@ -17,8 +17,8 @@ namespace Project_back_end.Migrations
                     Content = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     Title = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     Image = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    Views = table.Column<int>(type: "int", nullable: true),
-                    rating = table.Column<int>(type: "int", nullable: true)
+                    Views = table.Column<int>(type: "int", nullable: false),
+                    rating = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {

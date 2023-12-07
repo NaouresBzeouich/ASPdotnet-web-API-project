@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Project_back_end.Data;
+using Project_back_end.Models;
 
 namespace Project_back_end.Controllers
 {
@@ -16,12 +17,29 @@ namespace Project_back_end.Controllers
             this._DbBlogsContext = DbBlogsContext; 
         }
 
-        // a IEnumerable of all the blogs 
+        // gets all the blogs 
         [HttpGet]
         public IActionResult GetBlogs()
         {
             return Ok(_DbBlogsContext.Blogs.ToList());
         }
 
+        // post(add) a new blog
+        [HttpPost]
+        public IActionResult Create(CreateBlogRequest newBlog)
+        {
+            var Blog = new Blog()
+            {
+                Content = newBlog.Content,
+                Image = newBlog.Image,
+                Title = newBlog.Title,
+            }; 
+            _DbBlogsContext.Blogs.Add(Blog);
+            
+            _DbBlogsContext.SaveChanges();
+
+            return Ok(Blog);
+
+        }
     }
 }
