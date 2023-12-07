@@ -1,6 +1,6 @@
 namespace Project_back_end
 {
-    public class WeatherForecast
+    public class Blogs
     {
         public DateTime Date { get; set; }
 
