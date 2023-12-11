@@ -5,10 +5,12 @@
         // blog Id
         public int Id { get; set; }
 
-        // blog contains : title , text(Content) and image 
+        // blog contains : title , text(Content) , image and categorie 
         public string? Content { get; set; }
         public string? Title { get; set; }
         public string? Image {  get; set; }
+
+        public int? CategorieId { get; set; }
 
         // the number of views in this blog
         public int? Views  { get; set; }
