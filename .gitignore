@@ -1,0 +1,9 @@
+﻿# Visual Studio Code
+.vscode/
+
+# Visual Studio
+.vs/
+
+# build folder
+/bin/
+/obj/

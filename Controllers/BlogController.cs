@@ -1,8 +1,9 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using Project_back_end.Data;
 using Project_back_end.Models;
+using Microsoft.EntityFrameworkCore;
+
 
 namespace Project_back_end.Controllers
 {
@@ -55,7 +56,7 @@ namespace Project_back_end.Controllers
 
         // post(add) a new blog
         [HttpPost]
-        [Route("{/createBlog")]
+        [Route("/createBlog")]
 
         public async Task<Blog> Create(CreateBlogRequest newBlog)
         {
@@ -76,7 +77,7 @@ namespace Project_back_end.Controllers
 
             // delete a blog by its id 
         [HttpDelete]
-        [Route("{/delete/id:int}")]
+        [Route("/delete/{id:int}")]
         public async Task<Blog> Delete(int id)
         {
             var blog = await _DbBlogsContext.Blogs.FindAsync(id);
@@ -95,7 +96,7 @@ namespace Project_back_end.Controllers
 
             // update the blog by its id 
         [HttpPut]
-        [Route("{/updateBlog/id:int}")]
+        [Route("/updateBlog/{id:int}")]
         public async Task<Blog> UpdateBlog([FromRoute]int id, UpdateBlogRequest updatedBlog)
         {
             var blog = await  _DbBlogsContext.Blogs.FindAsync(id);
@@ -124,17 +125,24 @@ namespace Project_back_end.Controllers
                 blog.CategorieId = updatedBlog.CategorieId;
             }
 
-            await _DbBlogsContext.SaveChangesAsync();
+           await _DbBlogsContext.SaveChangesAsync();
 
             return blog ;
 
         }
 
-            // get blogs by its owner id 
+        // get blogs by its owner id 
 
 
-            // get blogs by category
-            
+        // get blogs by category
+        [HttpGet]
+        [Route("/getBlogsByCategory/{Category}")]
+        public  IEnumerable<Blog> getBlogsByCategory([FromRoute]Categorie Category)
+        {
+            IEnumerable<Blog> blogs = _DbBlogsContext.Blogs.Where(Blog => Blog.CategorieId == Category.Id );
+            return blogs;
+
+        }
 
     }
 }
