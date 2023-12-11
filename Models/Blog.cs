@@ -16,19 +16,21 @@
         public int? Views  { get; set; }
 
         // rate associated to the blog Somme(like : +1 ,dislike : -1)
-        public int? rating { get; set; }
+        public int? Likes { get; set; }
+        public int? Dislikes { get; set; }
 
         // association between Blog and its owner ( each bog has only one owner)
-        
-        
+
+
 
         // association between Blog and comment : each blog can have 0..* comment(s)
-        
+
 
         public Blog()
         {
             Views = 0;
-            rating = 0;
+            Likes = 0;
+            Dislikes = 0;
 
         }
     }

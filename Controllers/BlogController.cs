@@ -44,12 +44,12 @@ namespace Project_back_end.Controllers
             return blog;
         }
 
-            // gets the trending blogs (the top 10 blogs that have the biggest rate number  ) 
+            // gets the trending blogs (the top 10 blogs that have the biggest likes number  ) 
         [HttpGet]
         [Route("/getTrendingBlogs")]
         public async Task<IEnumerable<Blog>> getTrendingBlogs()
         {
-            IEnumerable<Blog> blogs = await  _DbBlogsContext.Blogs.OrderByDescending(blog => blog.rating).Take(10).ToListAsync();
+            IEnumerable<Blog> blogs = await  _DbBlogsContext.Blogs.OrderByDescending(blog => blog.Likes).Take(10).ToListAsync();
             return blogs;
 
         }

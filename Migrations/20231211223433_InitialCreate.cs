@@ -19,7 +19,8 @@ namespace Project_back_end.Migrations
                     Image = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     CategorieId = table.Column<int>(type: "int", nullable: true),
                     Views = table.Column<int>(type: "int", nullable: true),
-                    rating = table.Column<int>(type: "int", nullable: true)
+                    Likes = table.Column<int>(type: "int", nullable: true),
+                    Dislikes = table.Column<int>(type: "int", nullable: true)
                 },
                 constraints: table =>
                 {

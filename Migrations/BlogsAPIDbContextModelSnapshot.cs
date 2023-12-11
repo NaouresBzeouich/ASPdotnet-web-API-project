@@ -36,16 +36,19 @@ namespace Project_back_end.Migrations
                     b.Property<string>("Content")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<int?>("Dislikes")
+                        .HasColumnType("int");
+
                     b.Property<string>("Image")
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<int?>("Likes")
+                        .HasColumnType("int");
 
                     b.Property<string>("Title")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<int?>("Views")
-                        .HasColumnType("int");
-
-                    b.Property<int?>("rating")
                         .HasColumnType("int");
 
                     b.HasKey("Id");
