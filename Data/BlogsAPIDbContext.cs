@@ -7,6 +7,7 @@ namespace Project_back_end.Data
     public class BlogsAPIDbContext : IdentityDbContext
     {
         public DbSet<Blog> Blogs { get; set; }
+        public DbSet<User> users { get; set; }
         public BlogsAPIDbContext(DbContextOptions<BlogsAPIDbContext> options) : base(options)
         {
             // Constructor logic
