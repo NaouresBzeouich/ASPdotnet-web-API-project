@@ -12,24 +12,24 @@ namespace Project_back_end.Controllers
     public class BlogController : ControllerBase
     {
 
-        private readonly BlogsAPIDbContext _DbBlogsContext; 
+        private readonly BlogsAPIDbContext _DbBlogsContext;
 
-        public BlogController(BlogsAPIDbContext DbBlogsContext) 
+        public BlogController(BlogsAPIDbContext DbBlogsContext)
         {
-            this._DbBlogsContext = DbBlogsContext; 
+            this._DbBlogsContext = DbBlogsContext;
         }
 
 
         // gets all the blogs 
         [HttpGet]
         [Route("/getBlogs")]
-        public async  Task<IEnumerable<Blog>> GetBlogs()
+        public async Task<IEnumerable<Blog>> GetBlogs()
         {
             var blogs = await _DbBlogsContext.Blogs.ToListAsync();
-            return blogs ;
+            return blogs;
         }
 
-            // gets a blog with its id     
+        // gets a blog with its id     
         [HttpGet]
         [Route("/getBlog/{id:int}")]
         public async Task<Blog> GetBlog([FromRoute] int id)
@@ -44,12 +44,12 @@ namespace Project_back_end.Controllers
             return blog;
         }
 
-            // gets the trending blogs (the top 10 blogs that have the biggest likes number  ) 
+        // gets the trending blogs (the top 10 blogs that have the biggest likes number  ) 
         [HttpGet]
         [Route("/getTrendingBlogs")]
         public async Task<IEnumerable<Blog>> getTrendingBlogs()
         {
-            IEnumerable<Blog> blogs = await  _DbBlogsContext.Blogs.OrderByDescending(blog => blog.Likes).Take(10).ToListAsync();
+            IEnumerable<Blog> blogs = await _DbBlogsContext.Blogs.OrderByDescending(blog => blog.Likes).Take(10).ToListAsync();
             return blogs;
 
         }
@@ -58,24 +58,30 @@ namespace Project_back_end.Controllers
         [HttpPost]
         [Route("/createBlog")]
 
-        public async Task<Blog> Create(CreateBlogRequest newBlog)
+        public async Task<IActionResult> Create([FromBody] CreateBlogRequest newBlog)
         {
+            var user = await _DbBlogsContext.users.FindAsync(newBlog.UserId);
+            if (user == null)
+            {
+                return NotFound("User not found");
+            }
             var Blog = new Blog()
             {
                 Content = newBlog.Content,
                 Image = newBlog.Image,
                 Title = newBlog.Title,
                 CategorieId = newBlog.CategorieId,
-            }; 
+                User = user
+            };
             await _DbBlogsContext.Blogs.AddAsync(Blog);
-            
+
             await _DbBlogsContext.SaveChangesAsync();
 
-            return Blog ;
+            return Ok(Blog);
 
         }
 
-            // delete a blog by its id 
+        // delete a blog by its id 
         [HttpDelete]
         [Route("/delete/{id:int}")]
         public async Task<Blog> Delete(int id)
@@ -85,49 +91,49 @@ namespace Project_back_end.Controllers
             // si le blog Id n'existe pas
             if (blog == null)
             {
-                return null ; // mbe3id bech inredirectiha lel api necessary 
-             }
+                return null; // mbe3id bech inredirectiha lel api necessary 
+            }
             _DbBlogsContext.Remove(blog);
             await _DbBlogsContext.SaveChangesAsync();
-            return  blog ;
+            return blog;
 
 
         }
 
-            // update the blog by its id 
+        // update the blog by its id 
         [HttpPut]
         [Route("/updateBlog/{id:int}")]
-        public async Task<Blog> UpdateBlog([FromRoute]int id, UpdateBlogRequest updatedBlog)
+        public async Task<Blog> UpdateBlog([FromRoute] int id, UpdateBlogRequest updatedBlog)
         {
-            var blog = await  _DbBlogsContext.Blogs.FindAsync(id);
-                        
-                // si le blog Id n'existe pas
-            if(blog == null)
+            var blog = await _DbBlogsContext.Blogs.FindAsync(id);
+
+            // si le blog Id n'existe pas
+            if (blog == null)
             {
                 return null; // mbe3id netfehmou   
             }
 
-                // on peut faire un mise à jour juste sur des colonnes specifiques
-            if(updatedBlog.Title != null)
+            // on peut faire un mise à jour juste sur des colonnes specifiques
+            if (updatedBlog.Title != null)
             {
-                blog.Title = updatedBlog.Title; 
+                blog.Title = updatedBlog.Title;
             }
             if (updatedBlog.Content != null)
             {
                 blog.Content = updatedBlog.Content;
             }
-            if(updatedBlog.Image != null)
+            if (updatedBlog.Image != null)
             {
-                blog.Image = updatedBlog.Image; 
+                blog.Image = updatedBlog.Image;
             }
             if (updatedBlog.CategorieId != null)
             {
                 blog.CategorieId = updatedBlog.CategorieId;
             }
 
-           await _DbBlogsContext.SaveChangesAsync();
+            await _DbBlogsContext.SaveChangesAsync();
 
-            return blog ;
+            return blog;
 
         }
 
@@ -137,9 +143,9 @@ namespace Project_back_end.Controllers
         // get blogs by category
         [HttpGet]
         [Route("/getBlogsByCategory/{Category}")]
-        public  IEnumerable<Blog> getBlogsByCategory([FromRoute]Categorie Category)
+        public IEnumerable<Blog> getBlogsByCategory([FromRoute] Categorie Category)
         {
-            IEnumerable<Blog> blogs = _DbBlogsContext.Blogs.Where(Blog => Blog.CategorieId == Category.Id );
+            IEnumerable<Blog> blogs = _DbBlogsContext.Blogs.Where(Blog => Blog.CategorieId == Category.Id);
             return blogs;
 
         }

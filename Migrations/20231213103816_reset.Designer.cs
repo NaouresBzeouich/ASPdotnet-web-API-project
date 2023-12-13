@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Project_back_end.Data;
 
@@ -11,9 +12,10 @@ using Project_back_end.Data;
 namespace Project_back_end.Migrations
 {
     [DbContext(typeof(BlogsAPIDbContext))]
-    partial class BlogsAPIDbContextModelSnapshot : ModelSnapshot
+    [Migration("20231213103816_reset")]
+    partial class reset
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
