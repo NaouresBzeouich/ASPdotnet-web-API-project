@@ -1,8 +1,8 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Project_back_end.Data;
 using Project_back_end.Models;
-using System;
 
 namespace Project_back_end.Controllers
 {
@@ -10,15 +10,15 @@ namespace Project_back_end.Controllers
     [Route("api/[controller]")]
     public class UserController : ControllerBase
     {
-        //private readonly UserManager<User> _context;
+        private readonly BlogsAPIDbContext _dbContext;
         private readonly UserManager<User> _userManager;
         private readonly RoleManager<IdentityRole> _roleManager;
 
-        public UserController(UserManager<User> userManager, RoleManager<IdentityRole> roleManager)
+        public UserController(UserManager<User> userManager, RoleManager<IdentityRole> roleManager, BlogsAPIDbContext dbContext)
         {
             _userManager = userManager;
             _roleManager = roleManager;
-            //_context = userManager;
+            _dbContext = dbContext;
         }
 
         [HttpGet("")]
@@ -36,6 +36,19 @@ namespace Project_back_end.Controllers
             if (user != null)
             {
                 return Ok(user);
+            }
+
+            return NotFound(); // User with the given ID not found
+        }
+
+        [HttpGet("{id}/blogs")]
+        public async Task<IActionResult> GetUserBlogs(string id)
+        {
+            var user = await _dbContext.users.Include(u => u.Blogs).FirstOrDefaultAsync(u => u.Id == id);
+
+            if (user != null)
+            {
+                return Ok(user.Blogs);
             }
 
             return NotFound(); // User with the given ID not found
