@@ -32,16 +32,16 @@ namespace Project_back_end.Controllers
         // gets a blog with its id     
         [HttpGet]
         [Route("/getBlog/{id}")]
-        public async Task<Blog> GetBlog([FromRoute] Guid id)
+        public async Task<IActionResult> GetBlog([FromRoute] Guid id)
         {
             var blog = await _DbBlogsContext.Blogs.FindAsync(id);
 
             // si le blog Id n'existe pas
             if (blog == null)
             {
-                return null; // 5alit'ha bech be3id bech terja lel move elli 9bel'ha nrmlmnt avec un error msg 
+                return NotFound("there's no blog with this Id");  
             }
-            return blog;
+            return Ok(blog);
         }
 
         // gets the trending blogs (the top 10 blogs that have the biggest likes number  ) 
@@ -85,18 +85,18 @@ namespace Project_back_end.Controllers
         // delete a blog by its id 
         [HttpDelete]
         [Route("/delete/{id}")]
-        public async Task<Blog> Delete(Guid id)
+        public async Task<IActionResult> Delete(Guid id)
         {
             var blog = await _DbBlogsContext.Blogs.FindAsync(id);
 
             // si le blog Id n'existe pas
             if (blog == null)
             {
-                return null; // mbe3id bech inredirectiha lel api necessary 
+                return NotFound(" no blog with this id is found " ) ; 
             }
             _DbBlogsContext.Remove(blog);
             await _DbBlogsContext.SaveChangesAsync();
-            return blog;
+            return Ok(blog);
 
 
         }
@@ -104,14 +104,14 @@ namespace Project_back_end.Controllers
         // update the blog by its id 
         [HttpPut]
         [Route("/updateBlog/{id}")]
-        public async Task<Blog> UpdateBlog([FromRoute] Guid id, UpdateBlogRequest updatedBlog)
+        public async Task<IActionResult> UpdateBlog([FromRoute] Guid id, UpdateBlogRequest updatedBlog)
         {
             var blog = await _DbBlogsContext.Blogs.FindAsync(id);
 
             // si le blog Id n'existe pas
             if (blog == null)
             {
-                return null; // mbe3id netfehmou   
+                return NotFound("no blog with that id found ");   
             }
 
             // on peut faire un mise à jour juste sur des colonnes specifiques
@@ -134,28 +134,32 @@ namespace Project_back_end.Controllers
 
             await _DbBlogsContext.SaveChangesAsync();
 
-            return blog;
+            return Ok(blog);
 
         }
 
         // get blogs by its owner id 
         [HttpPost]
         [Route("/getBlogsByUser/{user}")]
-        public async Task<IEnumerable<Blog>> getBlogsByUser([FromRoute] User user)
+        public async Task<IActionResult> getBlogsByUser([FromRoute] User user)
         {
             var blogs = _DbBlogsContext.Blogs.Where(Blog => Blog.User == user);
 
-            return blogs;
+            if (blogs == null)
+            { return NotFound("there 's no blogs created by this user "); }
+            return Ok(blogs);
         }
 
 
         // get blogs by category
         [HttpGet]
         [Route("/getBlogsByCategory/{Category}")]
-        public async Task<IEnumerable<Blog>> getBlogsByCategory([FromRoute] Categorie Category)
+        public async Task<IActionResult> getBlogsByCategory([FromRoute] Categorie Category)
         {
             IEnumerable<Blog> blogs = _DbBlogsContext.Blogs.Where(Blog => Blog.CategorieId == Category.Id);
-            return blogs;
+            if (blogs == null)
+                return NotFound("there's no blogs in this category ");
+            return Ok(blogs);
 
         }
 
