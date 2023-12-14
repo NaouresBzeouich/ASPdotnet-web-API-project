@@ -8,11 +8,11 @@ namespace Project_back_end.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class CategoriesController : ControllerBase
+    public class CategoryController : ControllerBase
     {
         private readonly BlogsAPIDbContext _dbContext;
 
-        public CategoriesController(BlogsAPIDbContext dbContext)
+        public CategoryController(BlogsAPIDbContext dbContext)
         {
             _dbContext = dbContext;
         }
