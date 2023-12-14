@@ -5,7 +5,7 @@ namespace Project_back_end.Models
     public class Blog
     {
         // blog Id
-        public int Id { get; set; }
+        public Guid Id { get; set; }
 
         // blog contains : title , text(Content) , image and categorie 
         public string? Content { get; set; }
@@ -24,7 +24,7 @@ namespace Project_back_end.Models
         // association between Blog and its owner ( each bog has only one owner)
         [JsonIgnore]
         public virtual User User { get; set; }
-        public string UserId { get; set; }
+        public int? UserId { get; set; }
 
 
         // association between Blog and comment : each blog can have 0..* comment(s)

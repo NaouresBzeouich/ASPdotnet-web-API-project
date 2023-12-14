@@ -31,8 +31,8 @@ namespace Project_back_end.Controllers
 
         // gets a blog with its id     
         [HttpGet]
-        [Route("/getBlog/{id:int}")]
-        public async Task<Blog> GetBlog([FromRoute] int id)
+        [Route("/getBlog/{id}")]
+        public async Task<Blog> GetBlog([FromRoute] Guid id)
         {
             var blog = await _DbBlogsContext.Blogs.FindAsync(id);
 
@@ -83,8 +83,8 @@ namespace Project_back_end.Controllers
 
         // delete a blog by its id 
         [HttpDelete]
-        [Route("/delete/{id:int}")]
-        public async Task<Blog> Delete(int id)
+        [Route("/delete/{id}")]
+        public async Task<Blog> Delete(Guid id)
         {
             var blog = await _DbBlogsContext.Blogs.FindAsync(id);
 
@@ -102,8 +102,8 @@ namespace Project_back_end.Controllers
 
         // update the blog by its id 
         [HttpPut]
-        [Route("/updateBlog/{id:int}")]
-        public async Task<Blog> UpdateBlog([FromRoute] int id, UpdateBlogRequest updatedBlog)
+        [Route("/updateBlog/{id}")]
+        public async Task<Blog> UpdateBlog([FromRoute] Guid id, UpdateBlogRequest updatedBlog)
         {
             var blog = await _DbBlogsContext.Blogs.FindAsync(id);
 
@@ -138,14 +138,15 @@ namespace Project_back_end.Controllers
         }
 
         // get blogs by its owner id 
-
+        [HttpPost]
         [Route("/getBlogsByUser/{user}")]
         public async Task<IEnumerable<Blog>> getBlogsByUser([FromRoute] User user)
         {
-            var blogs =  _DbBlogsContext.Blogs.Where(Blog => Blog.User == user); 
+            var blogs = _DbBlogsContext.Blogs.Where(Blog => Blog.User == user);
 
             return blogs;
         }
+
 
         // get blogs by category
         [HttpGet]

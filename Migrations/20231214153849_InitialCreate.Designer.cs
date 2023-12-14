@@ -12,7 +12,7 @@ using Project_back_end.Data;
 namespace Project_back_end.Migrations
 {
     [DbContext(typeof(BlogsAPIDbContext))]
-    [Migration("20231214150248_InitialCreate")]
+    [Migration("20231214153849_InitialCreate")]
     partial class InitialCreate
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -230,11 +230,9 @@ namespace Project_back_end.Migrations
 
             modelBuilder.Entity("Project_back_end.Models.Blog", b =>
                 {
-                    b.Property<int>("Id")
+                    b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<int?>("CategorieId")
                         .HasColumnType("int");
