@@ -139,11 +139,18 @@ namespace Project_back_end.Controllers
 
         // get blogs by its owner id 
 
+        [Route("/getBlogsByUser/{user}")]
+        public async Task<IEnumerable<Blog>> getBlogsByUser([FromRoute] User user)
+        {
+            var blogs =  _DbBlogsContext.Blogs.Where(Blog => Blog.User == user); 
+
+            return blogs;
+        }
 
         // get blogs by category
         [HttpGet]
         [Route("/getBlogsByCategory/{Category}")]
-        public IEnumerable<Blog> getBlogsByCategory([FromRoute] Categorie Category)
+        public async Task<IEnumerable<Blog>> getBlogsByCategory([FromRoute] Categorie Category)
         {
             IEnumerable<Blog> blogs = _DbBlogsContext.Blogs.Where(Blog => Blog.CategorieId == Category.Id);
             return blogs;
