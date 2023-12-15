@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using Project_back_end.Data;
 using Project_back_end.Models;
 using Microsoft.EntityFrameworkCore;
-
+using Microsoft.AspNetCore.Components.Web;
 
 namespace Project_back_end.Controllers
 {
@@ -13,10 +13,11 @@ namespace Project_back_end.Controllers
     {
 
         private readonly BlogsAPIDbContext _DbBlogsContext;
-
-        public BlogController(BlogsAPIDbContext DbBlogsContext)
+        private readonly IWebHostEnvironment _environment; 
+        public BlogController(BlogsAPIDbContext DbBlogsContext, IWebHostEnvironment _environment)
         {
             this._DbBlogsContext = DbBlogsContext;
+            this._environment = _environment;
         }
 
 
@@ -163,5 +164,58 @@ namespace Project_back_end.Controllers
 
         }
 
+        // image management : 
+
+            // upload a image (you can use it when creating the blog or when you wanna update the image 
+        [HttpPost]
+        [Route("ImageUpload")]
+        public async Task<IActionResult> ImageUpload([FromForm] ImageModel imageModel )
+        {
+
+
+            var blog = await _DbBlogsContext.Blogs.FindAsync(imageModel.BlogId);
+            
+            if (blog == null)
+            {
+                return NotFound("Blog to insert the image not found ! ");
+            }
+
+            try
+            {
+                string Filepath = this._environment.WebRootPath + "\\Uploads\\Blogs\\" + imageModel.BlogId;
+
+                if (!System.IO.Directory.Exists(Filepath))  
+                {
+                    System.IO.Directory.CreateDirectory(Filepath);
+                }
+                string imagepath = Filepath + "\\image.png";
+                if (System.IO.Directory.Exists(imagepath))  // so you can use this also when you wanna update the image 
+                {
+                    System.IO.Directory.Delete(imagepath);
+                }
+
+                using (Stream stream = new FileStream(imagepath, FileMode.Create))
+                {
+                    imageModel.Image.CopyTo(stream);
+                }
+
+                blog.Image = imagepath;
+                await  _DbBlogsContext.SaveChangesAsync();
+
+                return Ok(blog);
+
+            }
+            catch (Exception ex)
+            {
+                return BadRequest("error in uploading the image !" + ex.Message);
+
+            }
+            
+        }
+
+       
+
     }
+
+
 }
