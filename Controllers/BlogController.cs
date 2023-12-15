@@ -1,10 +1,10 @@
-using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Project_back_end.Data;
 using Project_back_end.Models;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.AspNetCore.Components.Web;
-using Microsoft.AspNetCore.Mvc.RazorPages;
+using Microsoft.DotNet.Scaffolding.Shared.Messaging;
+using System;
 
 namespace Project_back_end.Controllers
 {
@@ -15,13 +15,11 @@ namespace Project_back_end.Controllers
         private readonly ILogger<BlogController> _logger;
 
         private readonly BlogsAPIDbContext _DbBlogsContext;
-        private readonly IWebHostEnvironment _environment; 
-        public BlogController(BlogsAPIDbContext DbBlogsContext, IWebHostEnvironment _environment)
 
-{
+        public BlogController(BlogsAPIDbContext DbBlogsContext, ILogger<BlogController> logger)
+        {
             this._logger = logger;
             this._DbBlogsContext = DbBlogsContext;
-            this._environment = _environment;
         }
 
 
@@ -31,40 +29,22 @@ namespace Project_back_end.Controllers
         public async Task<IEnumerable<Blog>> GetBlogs()
         {
             var blogs = await _DbBlogsContext.Blogs.ToListAsync();
-            if( blogs != null && blogs.Count >0)
-            {
-                foreach(var blog in blogs)
-                {
-                    blog.Image = getImageByBlog(blog.Id);
-                }
-
-                await _DbBlogsContext.SaveChangesAsync();
-
-                return blogs;
-            }else
-            {
-                return new List<Blog>();
-            }
-            
+            return blogs;
         }
 
         // gets a blog with its id     
         [HttpGet]
         [Route("/getBlog/{id}")]
-        public async Task<IActionResult> GetBlog([FromRoute] Guid id)
+        public async Task<Blog> GetBlog([FromRoute] Guid id)
         {
             var blog = await _DbBlogsContext.Blogs.FindAsync(id);
 
             // si le blog Id n'existe pas
             if (blog == null)
             {
-                return NotFound("there's no blog with this Id");  
+                return null; // 5alit'ha bech be3id bech terja lel move elli 9bel'ha nrmlmnt avec un error msg 
             }
-
-            blog.Image = getImageByBlog(blog.Id); 
-            await _DbBlogsContext.SaveChangesAsync();
-
-            return Ok(blog);
+            return blog;
         }
 
         // gets the trending blogs (the top 10 blogs that have the biggest likes number  ) 
@@ -114,16 +94,6 @@ namespace Project_back_end.Controllers
 
             }
 
-            var Blog = new Blog()
-            {
-                Content = newBlog.Content,
-                Title = newBlog.Title,
-                CategorieId = newBlog.CategorieId,
-                UserId = newBlog.UserId,
-                User = user
-            };
-            await _DbBlogsContext.Blogs.AddAsync(Blog);
-
 
             catch {
 
@@ -141,18 +111,18 @@ namespace Project_back_end.Controllers
         // delete a blog by its id 
         [HttpDelete]
         [Route("/delete/{id}")]
-        public async Task<IActionResult> Delete(Guid id)
+        public async Task<Blog> Delete(Guid id)
         {
             var blog = await _DbBlogsContext.Blogs.FindAsync(id);
 
             // si le blog Id n'existe pas
             if (blog == null)
             {
-                return NotFound(" no blog with this id is found " ) ; 
+                return null; // mbe3id bech inredirectiha lel api necessary 
             }
             _DbBlogsContext.Remove(blog);
             await _DbBlogsContext.SaveChangesAsync();
-            return Ok(blog);
+            return blog;
 
 
         }
@@ -160,14 +130,14 @@ namespace Project_back_end.Controllers
         // update the blog by its id 
         [HttpPut]
         [Route("/updateBlog/{id}")]
-        public async Task<IActionResult> UpdateBlog([FromRoute] Guid id, UpdateBlogRequest updatedBlog)
+        public async Task<Blog> UpdateBlog([FromRoute] Guid id, UpdateBlogRequest updatedBlog)
         {
             var blog = await _DbBlogsContext.Blogs.FindAsync(id);
 
             // si le blog Id n'existe pas
             if (blog == null)
             {
-                return NotFound("no blog with that id found ");   
+                return null; // mbe3id netfehmou   
             }
 
             // on peut faire un mise à jour juste sur des colonnes specifiques
@@ -179,6 +149,10 @@ namespace Project_back_end.Controllers
             {
                 blog.Content = updatedBlog.Content;
             }
+         /*   if (updatedBlog.Image != null)
+            {
+                blog.Image = updatedBlog.Image;
+            }*/
             if (updatedBlog.CategorieId != null)
             {
                 blog.CategorieId = updatedBlog.CategorieId;
@@ -186,7 +160,7 @@ namespace Project_back_end.Controllers
 
             await _DbBlogsContext.SaveChangesAsync();
 
-            return Ok(blog);
+            return blog;
 
         }
 
@@ -195,13 +169,9 @@ namespace Project_back_end.Controllers
         [Route("/getBlogsByUser")]
         public async Task<IEnumerable<Blog>> getBlogsByUser([FromBody] testModel userId)
         {
-
             Guid id = Guid.Parse(userId.name);
             var blogs = _DbBlogsContext.Blogs.Where(Blog => Blog.UserId == id);
-
-            if (blogs == null)
-            { return NotFound("there 's no blogs created by this user "); }
-            return Ok(blogs);
+            return blogs;
         }
 
 
@@ -211,106 +181,9 @@ namespace Project_back_end.Controllers
         public async Task<IEnumerable<Blog>> getBlogsByCategory( Categorie Category)
         {
             IEnumerable<Blog> blogs = _DbBlogsContext.Blogs.Where(Blog => Blog.CategorieId == Category.Id);
-            if (blogs == null)
-                return NotFound("there's no blogs in this category ");
-            return Ok(blogs);
+            return blogs;
 
         }
-
-        // image management : 
-
-            // upload a image (you can use it when creating the blog or when you wanna update the image 
-        [HttpPost]
-        [Route("ImageUpload")]
-        public async Task<IActionResult> ImageUpload([FromForm] ImageModel imageModel )
-        {
-
-
-            var blog = await _DbBlogsContext.Blogs.FindAsync(imageModel.BlogId);
-            
-            if (blog == null)
-            {
-                return NotFound("Blog to insert the image not found ! ");
-            }
-
-            try
-            {
-                string Filepath = this._environment.WebRootPath + "\\Uploads\\Blogs\\" + imageModel.BlogId;
-
-                if (!System.IO.Directory.Exists(Filepath))  
-                {
-                    System.IO.Directory.CreateDirectory(Filepath);
-                }
-                string imagepath = Filepath + "\\image.png";
-                if (System.IO.File.Exists(imagepath))  // so you can use this also when you wanna update the image 
-                {
-                    System.IO.File.Delete(imagepath);
-                }
-
-                using (Stream stream = new FileStream(imagepath, FileMode.Create))
-                {
-                    imageModel.Image.CopyTo(stream);
-                }
-
-                blog.Image = getImageByBlog(imageModel.BlogId);
-                _DbBlogsContext.SaveChanges();
-
-                return Ok(blog);
-
-            }
-            catch (Exception ex)
-            {
-                return BadRequest("error in uploading the image !" + ex.Message);
-
-            }
-            
-        }
-
-        [HttpDelete]
-        [Route("ImageRemove")]
-
-        public async   Task<IActionResult> removeImage(Guid blogId)
-        {
-            string Filepath = this._environment.WebRootPath + "\\Uploads\\Blogs\\" + blogId;
-            string imagepath = Filepath + "\\image.png";
-
-            if (System.IO.Directory.Exists(Filepath))
-            {
-                System.IO.File.Delete(imagepath);
-                System.IO.Directory.Delete(Filepath);
-
-                return Ok(); 
-            }
-            else
-            {
-                return NotFound();
-            }
-        }
-
-
-
-        [NonAction]
-        private string getImageByBlog(Guid blogId)
-        {
-            string imageURL = string.Empty;
-            string HostURL = "https://localhost:7054/"; // change it in your code  
-            string Filepath = this._environment.WebRootPath + "\\Uploads\\Blogs\\" + blogId;
-            string imagepath = Filepath + "\\image.png";
-
-            if (!System.IO.Directory.Exists(Filepath))   
-            {
-                imageURL = HostURL + "commun/noImage.jpg"; 
-            }
-        else
-            {
-                imageURL = HostURL+"Uploads/Blogs/"+blogId+"/image.png";
-            }
-
-            return imageURL; 
-        }
-       
 
     }
-
-
 }
