@@ -19,21 +19,22 @@ namespace Project_back_end.Controllers
 
         // this is only to add some categories hawka 7outt eeli 7achtik bih be3id delete it 
         [HttpPost]
-        [Route("/addCategories")]
-        public async Task<IEnumerable<Categorie>> AddCategories()
+        [Route("/addCategory")]
+        public async Task<IActionResult> AddCategory(  testModel cat)
         {
             // Create new categories
-            var category1 = new Categorie { Name = "Category 1" };
-            var category2 = new Categorie { Name = "Category 2" };
+            var category1 = new Categorie { Name = cat.name };
 
             // Add categories to the context
             _dbContext.Categories.Add(category1);
-            _dbContext.Categories.Add(category2);
 
             // Save changes to the database
             await _dbContext.SaveChangesAsync();
 
-            return _dbContext.Categories.ToList(); 
+            return Ok(new {
+                StatusCode=200,
+                    Message= "category added"
+            }); 
 
         }
 
@@ -47,17 +48,27 @@ namespace Project_back_end.Controllers
         }
 
         // get a category with its name 
-        [HttpGet]
-        [Route("/getCategoryByName/{Name}")]
-        public async Task<Categorie> getCategoryByName([FromRoute]string Name)
+        [HttpPost]
+        [Route("/getCategoryByName")]
+        public async Task<IActionResult> getCategoryByName(testModel cat)
         {
-            var categorie = await _dbContext.Categories.FirstOrDefaultAsync(c => c.Name == Name);
-            if(categorie == null)
+            var categorie = await _dbContext.Categories.FirstOrDefaultAsync(c => c.Name==cat.name);
+            if (categorie == null)
             {
-                return null; // change it if you have another case when there's no category with that name
+                return NotFound(new
+                {
+                    Message = "category not found",
+                    namepassedby=cat.name
+                }) ; // change it if you have another case when there's no category with that name
             }
             
-            return categorie;
+            return Ok(new
+            {
+                id= categorie.Id,
+                name= categorie.Name,
+                StatusCode=200,
+
+            });
         }
 
 

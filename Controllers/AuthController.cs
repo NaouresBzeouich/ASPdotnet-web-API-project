@@ -30,6 +30,7 @@ namespace Project_back_end.Controllers
             {
                 return new BadRequestObjectResult(new
                 {
+                    StatusCode=500,
                     Message = "User Registration Failed"
                 });
             }
@@ -74,7 +75,7 @@ namespace Project_back_end.Controllers
                 });
             }
             var token = await GenerateToken(identityUser);
-            return Ok(new { Token = token, Message = "Success" });
+            return Ok(new { Token = token, Message = "Success", userId=identityUser.Id });
         }
 
         [HttpPost]

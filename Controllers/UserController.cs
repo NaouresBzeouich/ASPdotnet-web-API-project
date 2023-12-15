@@ -41,6 +41,10 @@ namespace Project_back_end.Controllers
             return NotFound(); // User with the given ID not found
         }
 
+
+
+
+
         [HttpGet("{id}/blogs")]
         public async Task<IActionResult> GetUserBlogs(string id)
         {
