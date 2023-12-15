@@ -23,6 +23,22 @@ builder.Services.AddIdentity<User, IdentityRole>(options => options.SignIn.Requi
 
 builder.Services.AddDataProtection();
 
+builder.Services.AddLogging(builder =>
+{
+    builder.AddConsole();
+});
+
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowSpecificOrigin",
+        builder => builder.WithOrigins("http://localhost:4200")
+                          .AllowAnyHeader()
+                          .AllowAnyMethod());
+});
+
+
+
+
 // configure strongly typed settings objects
 var jwtSection = builder.Configuration.GetSection("JWTBearerTokenSettings");
 builder.Services.Configure<JwtBearerTokenSettings>(jwtSection);
@@ -51,6 +67,8 @@ builder.Services.AddAuthentication(options =>
 );
 
 var app = builder.Build();
+app.UseCors("AllowSpecificOrigin");
+
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())

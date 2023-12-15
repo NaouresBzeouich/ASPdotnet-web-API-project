@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Project_back_end.Data;
 using Project_back_end.Models;
@@ -12,11 +12,14 @@ namespace Project_back_end.Controllers
     [ApiController]
     public class BlogController : ControllerBase
     {
+        private readonly ILogger<BlogController> _logger;
 
         private readonly BlogsAPIDbContext _DbBlogsContext;
         private readonly IWebHostEnvironment _environment; 
         public BlogController(BlogsAPIDbContext DbBlogsContext, IWebHostEnvironment _environment)
-        {
+
+{
+            this._logger = logger;
             this._DbBlogsContext = DbBlogsContext;
             this._environment = _environment;
         }
@@ -80,11 +83,37 @@ namespace Project_back_end.Controllers
 
         public async Task<IActionResult> Create([FromBody] CreateBlogRequest newBlog)
         {
-            var user = await _DbBlogsContext.users.FindAsync(newBlog.UserId);
-            if (user == null)
-            {
-                return NotFound("User not found");
+            _logger.LogInformation("inside the action !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
+            string guidString = newBlog.UserId?.ToString();
+
+            var user = await _DbBlogsContext.users.FirstOrDefaultAsync(x=>(x.Id== guidString));
+            try{
+
+                var Blog = new Blog()
+                {
+                    Content = newBlog.Content,
+                    Image = newBlog.Image,
+                    Title = newBlog.Title,
+                    CategorieId = newBlog.CategoryId,
+                    UserId = newBlog.UserId,
+                    User = user
+                };
+                await _DbBlogsContext.Blogs.AddAsync(Blog);
+
+
+                await _DbBlogsContext.SaveChangesAsync();
+
+                return Ok(new
+                {
+                    StatusCode = 200,
+                    Message = "",
+                    Blog = Blog,
+                });
+
+
+
             }
+
             var Blog = new Blog()
             {
                 Content = newBlog.Content,
@@ -95,9 +124,17 @@ namespace Project_back_end.Controllers
             };
             await _DbBlogsContext.Blogs.AddAsync(Blog);
 
-            await _DbBlogsContext.SaveChangesAsync();
 
-            return Ok(Blog);
+            catch {
+
+                return BadRequest(new
+                {
+                    StatusCode = 400,
+                    Message = "bad request in the catch",
+                   
+                });
+                    }
+           
 
         }
 
@@ -155,10 +192,12 @@ namespace Project_back_end.Controllers
 
         // get blogs by its owner id 
         [HttpPost]
-        [Route("/getBlogsByUser/{user}")]
-        public async Task<IActionResult> getBlogsByUser([FromRoute] User user)
+        [Route("/getBlogsByUser")]
+        public async Task<IEnumerable<Blog>> getBlogsByUser([FromBody] testModel userId)
         {
-            var blogs = _DbBlogsContext.Blogs.Where(Blog => Blog.User == user);
+
+            Guid id = Guid.Parse(userId.name);
+            var blogs = _DbBlogsContext.Blogs.Where(Blog => Blog.UserId == id);
 
             if (blogs == null)
             { return NotFound("there 's no blogs created by this user "); }
@@ -167,9 +206,9 @@ namespace Project_back_end.Controllers
 
 
         // get blogs by category
-        [HttpGet]
-        [Route("/getBlogsByCategory/{Category}")]
-        public async Task<IActionResult> getBlogsByCategory([FromRoute] Categorie Category)
+        [HttpPost]
+        [Route("/getBlogsByCategory")]
+        public async Task<IEnumerable<Blog>> getBlogsByCategory( Categorie Category)
         {
             IEnumerable<Blog> blogs = _DbBlogsContext.Blogs.Where(Blog => Blog.CategorieId == Category.Id);
             if (blogs == null)
