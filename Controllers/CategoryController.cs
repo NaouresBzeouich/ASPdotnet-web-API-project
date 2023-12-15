@@ -49,15 +49,15 @@ namespace Project_back_end.Controllers
         // get a category with its name 
         [HttpGet]
         [Route("/getCategoryByName/{Name}")]
-        public async Task<Categorie> getCategoryByName([FromRoute]string Name)
+        public async Task<IActionResult> getCategoryByName([FromRoute]string Name)
         {
             var categorie = await _dbContext.Categories.FirstOrDefaultAsync(c => c.Name == Name);
             if(categorie == null)
             {
-                return null; // change it if you have another case when there's no category with that name
+                return BadRequest(); // change it if you have another case when there's no category with that name
             }
             
-            return categorie;
+            return Ok(categorie);
         }
 
 

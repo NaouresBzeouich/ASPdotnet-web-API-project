@@ -24,7 +24,7 @@ namespace Project_back_end.Models
         // association between Blog and its owner ( each bog has only one owner)
         [JsonIgnore]
         public virtual User User { get; set; }
-        public int? UserId { get; set; }
+        public string? UserId { get; set; }
 
 
         // association between Blog and comment : each blog can have 0..* comment(s)
