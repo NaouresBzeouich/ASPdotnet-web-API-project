@@ -27,6 +27,7 @@ namespace Project_back_end.Models
         public Guid? UserId { get; set; }
 
 
+
         // association between Blog and comment : each blog can have 0..* comment(s)
 
 

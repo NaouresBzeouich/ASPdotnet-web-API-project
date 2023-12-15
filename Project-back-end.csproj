@@ -26,4 +26,9 @@
 		<PackageReference Include="Swashbuckle.AspNetCore" Version="6.5.0" />
 	</ItemGroup>
 
+	<ItemGroup>
+	  <Folder Include="wwwroot\commun\" />
+	  <Folder Include="wwwroot\Uploads\Blogs\" />
+	</ItemGroup>
+
 </Project>
