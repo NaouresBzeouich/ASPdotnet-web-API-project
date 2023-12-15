@@ -187,7 +187,7 @@ namespace Project_back_end.Controllers
         [Route("/getBlogsByUser")]
         public async Task<IEnumerable<Blog>> getBlogsByUser([FromBody] testModel userId)
         {
-            Guid id = Guid.Parse(userId.name);
+            string id = Guid.Parse(userId.name).ToString(); 
             var blogs = _DbBlogsContext.Blogs.Where(Blog => Blog.UserId == id);
             return blogs;
         }
