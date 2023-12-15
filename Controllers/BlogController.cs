@@ -4,6 +4,7 @@ using Project_back_end.Data;
 using Project_back_end.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Components.Web;
+using Microsoft.AspNetCore.Mvc.RazorPages;
 
 namespace Project_back_end.Controllers
 {
@@ -27,7 +28,21 @@ namespace Project_back_end.Controllers
         public async Task<IEnumerable<Blog>> GetBlogs()
         {
             var blogs = await _DbBlogsContext.Blogs.ToListAsync();
-            return blogs;
+            if( blogs != null && blogs.Count >0)
+            {
+                foreach(var blog in blogs)
+                {
+                    blog.Image = getImageByBlog(blog.Id);
+                }
+
+                await _DbBlogsContext.SaveChangesAsync();
+
+                return blogs;
+            }else
+            {
+                return new List<Blog>();
+            }
+            
         }
 
         // gets a blog with its id     
@@ -42,6 +57,10 @@ namespace Project_back_end.Controllers
             {
                 return NotFound("there's no blog with this Id");  
             }
+
+            blog.Image = getImageByBlog(blog.Id); 
+            await _DbBlogsContext.SaveChangesAsync();
+
             return Ok(blog);
         }
 
@@ -69,7 +88,6 @@ namespace Project_back_end.Controllers
             var Blog = new Blog()
             {
                 Content = newBlog.Content,
-                Image = newBlog.Image,
                 Title = newBlog.Title,
                 CategorieId = newBlog.CategorieId,
                 UserId = newBlog.UserId,
@@ -123,10 +141,6 @@ namespace Project_back_end.Controllers
             if (updatedBlog.Content != null)
             {
                 blog.Content = updatedBlog.Content;
-            }
-            if (updatedBlog.Image != null)
-            {
-                blog.Image = updatedBlog.Image;
             }
             if (updatedBlog.CategorieId != null)
             {
@@ -189,9 +203,9 @@ namespace Project_back_end.Controllers
                     System.IO.Directory.CreateDirectory(Filepath);
                 }
                 string imagepath = Filepath + "\\image.png";
-                if (System.IO.Directory.Exists(imagepath))  // so you can use this also when you wanna update the image 
+                if (System.IO.File.Exists(imagepath))  // so you can use this also when you wanna update the image 
                 {
-                    System.IO.Directory.Delete(imagepath);
+                    System.IO.File.Delete(imagepath);
                 }
 
                 using (Stream stream = new FileStream(imagepath, FileMode.Create))
@@ -199,8 +213,8 @@ namespace Project_back_end.Controllers
                     imageModel.Image.CopyTo(stream);
                 }
 
-                blog.Image = imagepath;
-                await  _DbBlogsContext.SaveChangesAsync();
+                blog.Image = getImageByBlog(imageModel.BlogId);
+                _DbBlogsContext.SaveChanges();
 
                 return Ok(blog);
 
@@ -213,6 +227,48 @@ namespace Project_back_end.Controllers
             
         }
 
+        [HttpDelete]
+        [Route("ImageRemove")]
+
+        public async   Task<IActionResult> removeImage(Guid blogId)
+        {
+            string Filepath = this._environment.WebRootPath + "\\Uploads\\Blogs\\" + blogId;
+            string imagepath = Filepath + "\\image.png";
+
+            if (System.IO.Directory.Exists(Filepath))
+            {
+                System.IO.File.Delete(imagepath);
+                System.IO.Directory.Delete(Filepath);
+
+                return Ok(); 
+            }
+            else
+            {
+                return NotFound();
+            }
+        }
+
+
+
+        [NonAction]
+        private string getImageByBlog(Guid blogId)
+        {
+            string imageURL = string.Empty;
+            string HostURL = "https://localhost:7054/"; // change it in your code  
+            string Filepath = this._environment.WebRootPath + "\\Uploads\\Blogs\\" + blogId;
+            string imagepath = Filepath + "\\image.png";
+
+            if (!System.IO.Directory.Exists(Filepath))   
+            {
+                imageURL = HostURL + "commun/noImage.jpg"; 
+            }
+        else
+            {
+                imageURL = HostURL+"Uploads/Blogs/"+blogId+"/image.png";
+            }
+
+            return imageURL; 
+        }
        
 
     }
