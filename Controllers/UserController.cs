@@ -28,10 +28,10 @@ namespace Project_back_end.Controllers
             return Ok(users);
         }
 
-        [HttpGet("{id}")]
-        public async Task<IActionResult> GetUserById(string id)
+        [HttpPost("getUserById")]
+        public async Task<IActionResult> GetUserById( [FromBody]  testModel id )
         {
-            var user = await _userManager.FindByIdAsync(id);
+            var user = await _userManager.FindByIdAsync(id.name);
 
             if (user != null)
             {
