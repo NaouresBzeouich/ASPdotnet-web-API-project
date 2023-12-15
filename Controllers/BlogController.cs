@@ -71,7 +71,7 @@ namespace Project_back_end.Controllers
                 Image = newBlog.Image,
                 Title = newBlog.Title,
                 CategorieId = newBlog.CategorieId,
-                UserId = newBlog.UserId,
+                //UserId = newBlog.UserId,
                 User = user
             };
             await _DbBlogsContext.Blogs.AddAsync(Blog);

@@ -2,7 +2,7 @@ namespace Project_back_end.Models
 {
     public class Comment
     {
-        public guid Id { get; set; }
+        public Guid Id { get; set; }
         public string? Content { get; set; }
         public int? rating { get; set; }
 		public virtual User User { get; set; }
