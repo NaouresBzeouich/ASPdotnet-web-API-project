@@ -82,16 +82,26 @@ namespace Project_back_end.Controllers
 
             if (existingUser != null)
             {
-                existingUser.UserName = updatedUser.UserName;
-                existingUser.Email = updatedUser.Email;
-                existingUser.EmailConfirmed = updatedUser.EmailConfirmed;
-                existingUser.PhoneNumber = updatedUser.PhoneNumber;
-                existingUser.PhoneNumberConfirmed = updatedUser.PhoneNumberConfirmed;
-                existingUser.TwoFactorEnabled = updatedUser.TwoFactorEnabled;
-                existingUser.LockoutEnd = updatedUser.LockoutEnd;
-                existingUser.LockoutEnabled = updatedUser.LockoutEnabled;
-                existingUser.AccessFailedCount = updatedUser.AccessFailedCount;
-                existingUser.Bio = updatedUser.Bio;
+                if (updatedUser.UserName != null)
+                    existingUser.UserName = updatedUser.UserName;
+                if (updatedUser.Email != null)
+                    existingUser.Email = updatedUser.Email;
+                if (updatedUser.EmailConfirmed != null)
+                    existingUser.EmailConfirmed = updatedUser.EmailConfirmed;
+                if (updatedUser.PhoneNumber != null)
+                    existingUser.PhoneNumber = updatedUser.PhoneNumber;
+                if (updatedUser.PhoneNumberConfirmed != null)
+                    existingUser.PhoneNumberConfirmed = updatedUser.PhoneNumberConfirmed;
+                if (updatedUser.TwoFactorEnabled != null)
+                    existingUser.TwoFactorEnabled = updatedUser.TwoFactorEnabled;
+                if (updatedUser.LockoutEnd != null)
+                    existingUser.LockoutEnd = updatedUser.LockoutEnd;
+                if (updatedUser.LockoutEnabled != null)
+                    existingUser.LockoutEnabled = updatedUser.LockoutEnabled;
+                if (updatedUser.AccessFailedCount != null)
+                    existingUser.AccessFailedCount = updatedUser.AccessFailedCount;
+                if (updatedUser.Bio != null)
+                    existingUser.Bio = updatedUser.Bio;
 
                 var result = await _userManager.UpdateAsync(existingUser);
                 if (result.Succeeded)
