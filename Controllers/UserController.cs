@@ -21,7 +21,7 @@ namespace Project_back_end.Controllers
             _dbContext = dbContext;
         }
 
-        [HttpGet("")]
+        [HttpGet]
         public async Task<IActionResult> GetUsers()
         {
             var users = await _userManager.Users.ToListAsync();
@@ -42,9 +42,6 @@ namespace Project_back_end.Controllers
         }
 
 
-
-
-
         [HttpGet("{id}/blogs")]
         public async Task<IActionResult> GetUserBlogs(string id)
         {
@@ -58,7 +55,7 @@ namespace Project_back_end.Controllers
             return NotFound(); // User with the given ID not found
         }
 
-        [HttpPost("user")]
+        [HttpPost]
         public async Task<IActionResult> CreateUser(User user)
         {
             if (ModelState.IsValid) // Validate the model state
@@ -75,22 +72,33 @@ namespace Project_back_end.Controllers
             return BadRequest(ModelState); // Return validation errors
         }
 
-        [HttpPut("user/{id}")]
+        [HttpPut("{id}")]
         public async Task<IActionResult> UpdateUser(string id, [FromBody] User updatedUser)
         {
             var existingUser = await _userManager.FindByIdAsync(id);
 
             if (existingUser != null)
             {
-                existingUser.UserName = updatedUser.UserName;
-                existingUser.Email = updatedUser.Email;
-                existingUser.EmailConfirmed = updatedUser.EmailConfirmed;
-                existingUser.PhoneNumber = updatedUser.PhoneNumber;
-                existingUser.PhoneNumberConfirmed = updatedUser.PhoneNumberConfirmed;
-                existingUser.TwoFactorEnabled = updatedUser.TwoFactorEnabled;
-                existingUser.LockoutEnd = updatedUser.LockoutEnd;
-                existingUser.LockoutEnabled = updatedUser.LockoutEnabled;
-                existingUser.AccessFailedCount = updatedUser.AccessFailedCount;
+                if (updatedUser.UserName != null)
+                    existingUser.UserName = updatedUser.UserName;
+                if (updatedUser.Email != null)
+                    existingUser.Email = updatedUser.Email;
+                if (updatedUser.EmailConfirmed != null)
+                    existingUser.EmailConfirmed = updatedUser.EmailConfirmed;
+                if (updatedUser.PhoneNumber != null)
+                    existingUser.PhoneNumber = updatedUser.PhoneNumber;
+                if (updatedUser.PhoneNumberConfirmed != null)
+                    existingUser.PhoneNumberConfirmed = updatedUser.PhoneNumberConfirmed;
+                if (updatedUser.TwoFactorEnabled != null)
+                    existingUser.TwoFactorEnabled = updatedUser.TwoFactorEnabled;
+                if (updatedUser.LockoutEnd != null)
+                    existingUser.LockoutEnd = updatedUser.LockoutEnd;
+                if (updatedUser.LockoutEnabled != null)
+                    existingUser.LockoutEnabled = updatedUser.LockoutEnabled;
+                if (updatedUser.AccessFailedCount != null)
+                    existingUser.AccessFailedCount = updatedUser.AccessFailedCount;
+                if (updatedUser.Bio != null)
+                    existingUser.Bio = updatedUser.Bio;
 
                 var result = await _userManager.UpdateAsync(existingUser);
                 if (result.Succeeded)
@@ -104,7 +112,7 @@ namespace Project_back_end.Controllers
         }
 
 
-        [HttpDelete("user/{id}")]
+        [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteUser(string id)
         {
             var user = await _userManager.FindByIdAsync(id);
@@ -124,7 +132,7 @@ namespace Project_back_end.Controllers
             return BadRequest(new { Errors = result.Errors });
         }
 
-        [HttpPost("user/{userId}/role/{roleName}")]
+        [HttpPost("{userId}/role/{roleName}")]
         public async Task<IActionResult> AssignRole(string userId, string roleName)
         {
             // Find the user by ID
@@ -156,7 +164,7 @@ namespace Project_back_end.Controllers
             }
         }
 
-        [HttpDelete("user/{userId}/role/{roleName}")]
+        [HttpDelete("{userId}/role/{roleName}")]
         public async Task<IActionResult> RemoveRole(string userId, string roleName)
         {
             // Find the user by ID
