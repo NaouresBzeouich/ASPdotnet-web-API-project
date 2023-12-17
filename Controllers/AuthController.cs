@@ -37,7 +37,8 @@ namespace Project_back_end.Controllers
             var identityUser = new User()
             {
                 UserName = userDetails.username,
-                Email = userDetails.Email
+                Email = userDetails.Email,
+                Bio = userDetails.Bio
             };
             var result = await userManager.CreateAsync(identityUser, userDetails.Password);
             if (!result.Succeeded)
