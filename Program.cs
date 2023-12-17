@@ -49,6 +49,15 @@ builder.Services.AddAuthentication(options =>
     };
 }
 );
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy(name: "MyPolicy",
+                policy =>
+                {
+                    policy.WithOrigins("https://localhost:7054", "https://localhost:7054")
+                            .WithMethods("POST", "PUT", "DELETE", "GET");
+                });
+});
 
 var app = builder.Build();
 
