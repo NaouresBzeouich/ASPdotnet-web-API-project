@@ -23,14 +23,14 @@ namespace Project_back_end.Controllers
 
 
         [HttpPost]
-        [Route("Register")]
+        [Route("api/Register")]
         public async Task<IActionResult> Register([FromBody] RegisterCredentials userDetails)
         {
             if (!ModelState.IsValid || userDetails == null)
             {
                 return new BadRequestObjectResult(new
                 {
-                    StatusCode=500,
+                    StatusCode = 500,
                     Message = "User Registration Failed"
                 });
             }
@@ -60,7 +60,7 @@ namespace Project_back_end.Controllers
 
 
         [HttpPost]
-        [Route("Login")]
+        [Route("api/Login")]
         public async Task<IActionResult> Login([FromBody] LoginCredentials credentials)
         {
             User identityUser;
@@ -75,11 +75,11 @@ namespace Project_back_end.Controllers
                 });
             }
             var token = await GenerateToken(identityUser);
-            return Ok(new { Token = token, Message = "Success", userId=identityUser.Id });
+            return Ok(new { Token = token, Message = "Success", userId = identityUser.Id });
         }
 
         [HttpPost]
-        [Route("Logout")]
+        [Route("api/Logout")]
         public async Task<IActionResult> Logout()
         {
             // Well, What do you want to do here ?

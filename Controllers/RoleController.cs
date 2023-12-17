@@ -1,8 +1,7 @@
-﻿using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Identity;
+﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using System;
+using Project_back_end.Models;
 
 namespace Project_back_end.Controllers
 {
@@ -11,16 +10,16 @@ namespace Project_back_end.Controllers
     [Route("api/[controller]")]
     public class RoleController : ControllerBase
     {
-        //private readonly AppDbContext _context;
+        private readonly UserManager<User> _userManager;
         private readonly RoleManager<IdentityRole> _roleManager;
 
-        public RoleController(RoleManager<IdentityRole> roleManager)
+        public RoleController(RoleManager<IdentityRole> roleManager, UserManager<User> userManager)
         {
-            //_context = context;
+            _userManager = userManager;
             _roleManager = roleManager;
         }
 
-        [HttpGet("")]
+        [HttpGet]
         public async Task<IActionResult> GetRoles()
         {
             var roles = await _roleManager.Roles.ToListAsync();
@@ -38,7 +37,7 @@ namespace Project_back_end.Controllers
             return Ok(role);
         }
 
-        [HttpPost("role/{roleName}")]
+        [HttpPost("{roleName}")]
         public async Task<IActionResult> CreateRole(string roleName)
         {
             var role = new IdentityRole(roleName);
@@ -54,7 +53,7 @@ namespace Project_back_end.Controllers
         }
 
 
-        [HttpPut("role/{id}/{newRoleName}")]
+        [HttpPut("{id}/{newRoleName}")]
         public async Task<IActionResult> UpdateRole(string id, string newRoleName)
         {
             var role = await _roleManager.FindByIdAsync(id);
@@ -78,7 +77,7 @@ namespace Project_back_end.Controllers
 
 
 
-        [HttpDelete("role/{id}")]
+        [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteRole(string id)
         {
             var role = await _roleManager.FindByIdAsync(id);
@@ -97,6 +96,26 @@ namespace Project_back_end.Controllers
 
             return BadRequest(new { Errors = result.Errors });
         }
+
+        [HttpGet("{id}/users")]
+        public async Task<IActionResult> GetUsersInRole(string id)
+        {
+            // Find the role by name
+            var role = await _roleManager.FindByIdAsync(id);
+
+            if (role == null)
+            {
+                // Handle the case where the role doesn't exist
+                return NotFound(new { Message = "Role not found." });
+            }
+
+            // Get the users in the specified role
+            var usersInRole = await _userManager.GetUsersInRoleAsync(role.Name);
+
+            return Ok(usersInRole);
+        }
+
+
     }
 }
 

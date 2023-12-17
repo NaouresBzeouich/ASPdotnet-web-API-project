@@ -21,7 +21,7 @@ namespace Project_back_end.Controllers
             _dbContext = dbContext;
         }
 
-        [HttpGet("")]
+        [HttpGet]
         public async Task<IActionResult> GetUsers()
         {
             var users = await _userManager.Users.ToListAsync();
@@ -42,9 +42,6 @@ namespace Project_back_end.Controllers
         }
 
 
-
-
-
         [HttpGet("{id}/blogs")]
         public async Task<IActionResult> GetUserBlogs(string id)
         {
@@ -58,7 +55,7 @@ namespace Project_back_end.Controllers
             return NotFound(); // User with the given ID not found
         }
 
-        [HttpPost("user")]
+        [HttpPost]
         public async Task<IActionResult> CreateUser(User user)
         {
             if (ModelState.IsValid) // Validate the model state
@@ -75,7 +72,7 @@ namespace Project_back_end.Controllers
             return BadRequest(ModelState); // Return validation errors
         }
 
-        [HttpPut("user/{id}")]
+        [HttpPut("{id}")]
         public async Task<IActionResult> UpdateUser(string id, [FromBody] User updatedUser)
         {
             var existingUser = await _userManager.FindByIdAsync(id);
@@ -115,7 +112,7 @@ namespace Project_back_end.Controllers
         }
 
 
-        [HttpDelete("user/{id}")]
+        [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteUser(string id)
         {
             var user = await _userManager.FindByIdAsync(id);
@@ -135,7 +132,7 @@ namespace Project_back_end.Controllers
             return BadRequest(new { Errors = result.Errors });
         }
 
-        [HttpPost("user/{userId}/role/{roleName}")]
+        [HttpPost("{userId}/role/{roleName}")]
         public async Task<IActionResult> AssignRole(string userId, string roleName)
         {
             // Find the user by ID
@@ -167,7 +164,7 @@ namespace Project_back_end.Controllers
             }
         }
 
-        [HttpDelete("user/{userId}/role/{roleName}")]
+        [HttpDelete("{userId}/role/{roleName}")]
         public async Task<IActionResult> RemoveRole(string userId, string roleName)
         {
             // Find the user by ID
