@@ -5,6 +5,7 @@ namespace Project_back_end.Models
 {
     public class User : IdentityUser
     {
+        public string? Bio { get; set; }
         // User has blogs :
         [JsonIgnore]
         public virtual ICollection<Blog>? Blogs { get; set; }

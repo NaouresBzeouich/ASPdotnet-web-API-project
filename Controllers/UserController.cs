@@ -91,6 +91,7 @@ namespace Project_back_end.Controllers
                 existingUser.LockoutEnd = updatedUser.LockoutEnd;
                 existingUser.LockoutEnabled = updatedUser.LockoutEnabled;
                 existingUser.AccessFailedCount = updatedUser.AccessFailedCount;
+                existingUser.Bio = updatedUser.Bio;
 
                 var result = await _userManager.UpdateAsync(existingUser);
                 if (result.Succeeded)
