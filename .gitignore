@@ -11,3 +11,6 @@
 
 # appsettings
 appsettings.json
+
+# migrations
+Migrations/
