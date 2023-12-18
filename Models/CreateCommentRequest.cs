@@ -6,10 +6,7 @@ namespace Project_back_end.Models
         public string? BlogId { get; set; }
         public string? UserId { get; set; }
 
-        public CreateCommentRequest()
-        {
-            Content = "kjd zo ceo";
-        }
+       
 
 
     }

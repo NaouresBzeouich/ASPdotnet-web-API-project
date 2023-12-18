@@ -98,11 +98,11 @@ namespace Project_back_end.Controllers
         public async Task<IActionResult> DeleteComment([FromRoute] Guid id)
         {
             var comment = await _db.Comments.FindAsync(id);
-           /* if (comment == null) {
+            if (comment == null) {
                 return NotFound("there isn't a comment to begin with");
             }
             _db.Comments.Remove(comment);
-           await  _db.SaveChangesAsync();*/
+           await  _db.SaveChangesAsync();
             return Ok(comment);
         }
 
