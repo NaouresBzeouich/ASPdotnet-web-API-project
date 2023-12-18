@@ -8,3 +8,9 @@
 /bin/
 /obj/
 /.vs/Project-back-end/FileContentIndex/ca7451f1-5960-45a0-a16c-6f1db3e9586d.vsidx
+
+# appsettings
+appsettings.json
+
+# migrations
+Migrations/
