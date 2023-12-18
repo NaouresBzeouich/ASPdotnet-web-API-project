@@ -19,7 +19,7 @@ namespace Project_back_end.Controllers
 
         private readonly IWebHostEnvironment _environment;
 
-        public BlogController(BlogsAPIDbContext DbBlogsContext, ILogger<BlogController> logger , IWebHostEnvironment _environment)
+        public BlogController(BlogsAPIDbContext DbBlogsContext, ILogger<BlogController> logger, IWebHostEnvironment _environment)
         {
             this._logger = logger;
             this._DbBlogsContext = DbBlogsContext;
@@ -88,8 +88,9 @@ namespace Project_back_end.Controllers
             _logger.LogInformation("inside the action !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
             string guidString = newBlog.UserId?.ToString();
 
-            var user = await _DbBlogsContext.users.FirstOrDefaultAsync(x=>(x.Id== guidString));
-            try{
+            var user = await _DbBlogsContext.users.FirstOrDefaultAsync(x => (x.Id == guidString));
+            try
+            {
 
                 var Blog = new Blog()
                 {
@@ -117,16 +118,17 @@ namespace Project_back_end.Controllers
             }
 
 
-            catch {
+            catch
+            {
 
                 return BadRequest(new
                 {
                     StatusCode = 400,
                     Message = "bad request in the catch",
-                   
+
                 });
-                    }
-           
+            }
+
 
         }
 
@@ -187,7 +189,7 @@ namespace Project_back_end.Controllers
         [Route("/getBlogsByUser")]
         public async Task<IEnumerable<Blog>> getBlogsByUser([FromBody] testModel userId)
         {
-            string id = Guid.Parse(userId.name).ToString(); 
+            string id = Guid.Parse(userId.name).ToString();
             var blogs = _DbBlogsContext.Blogs.Where(Blog => Blog.UserId == id);
             return blogs;
         }
@@ -196,7 +198,7 @@ namespace Project_back_end.Controllers
         // get blogs by category
         [HttpPost]
         [Route("/getBlogsByCategory")]
-        public async Task<IEnumerable<Blog>> getBlogsByCategory( Categorie Category)
+        public async Task<IEnumerable<Blog>> getBlogsByCategory(Categorie Category)
         {
             IEnumerable<Blog> blogs = _DbBlogsContext.Blogs.Where(Blog => Blog.CategorieId == Category.Id);
             return blogs;
@@ -205,7 +207,7 @@ namespace Project_back_end.Controllers
 
         // image management : 
 
-            // upload a image (you can use it when creating the blog or when you wanna update the image 
+        // upload a image (you can use it when creating the blog or when you wanna update the image 
         [HttpPost]
         [Route("ImageUpload")]
         public async Task<IActionResult> ImageUpload([FromForm] ImageModel imageModel)
@@ -248,7 +250,7 @@ namespace Project_back_end.Controllers
         }
 
 
-            // to delete an image : 
+        // to delete an image : 
         [HttpDelete]
         [Route("ImageRemove")]
 
@@ -270,8 +272,8 @@ namespace Project_back_end.Controllers
             }
         }
 
-            
-             // this action to let the attribue image in blog  an URL 
+
+        // this action to let the attribue image in blog  an URL 
         [NonAction]
         private string getImageByBlog(Guid blogId)
         {
@@ -296,4 +298,3 @@ namespace Project_back_end.Controllers
     }
 
 }
-
