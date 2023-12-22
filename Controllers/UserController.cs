@@ -41,11 +41,11 @@ namespace Project_back_end.Controllers
             return NotFound(); // User with the given ID not found
         }
 
-
+/*
         [HttpGet("{id}/blogs")]
         public async Task<IActionResult> GetUserBlogs(string id)
         {
-            var user = await _dbContext.users.Include(u => u.Blogs).FirstOrDefaultAsync(u => u.Id == id);
+            var user= await _dbContext.users.Include(u => u.Blogs).FirstOrDefaultAsync(u => u.Id == id);
 
             if (user != null)
             {
@@ -70,7 +70,7 @@ namespace Project_back_end.Controllers
             }
 
             return BadRequest(ModelState); // Return validation errors
-        }
+        }*/
 
         [HttpPut("{id}")]
         public async Task<IActionResult> UpdateUser(string id, [FromBody] User updatedUser)
@@ -97,8 +97,8 @@ namespace Project_back_end.Controllers
                     existingUser.LockoutEnabled = updatedUser.LockoutEnabled;
                 if (updatedUser.AccessFailedCount != null)
                     existingUser.AccessFailedCount = updatedUser.AccessFailedCount;
-                if (updatedUser.Bio != null)
-                    existingUser.Bio = updatedUser.Bio;
+              //  if (updatedUser.Bio != null)
+               //     existingUser.Bio = updatedUser.Bio;
 
                 var result = await _userManager.UpdateAsync(existingUser);
                 if (result.Succeeded)

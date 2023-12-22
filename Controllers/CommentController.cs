@@ -86,11 +86,13 @@ namespace Project_back_end.Controllers
             int a = 5;
             return Ok(a);
         }
-        [HttpGet]
+        [HttpPost]
         [Route("/GetCommentsByBlog")]
-        public IActionResult GetCommentsByBlogs([FromQuery] Guid BlogId)
+        public IActionResult GetCommentsByBlogs([FromBody] testModel Blogid)
         {
-            var comments = _db.Comments.Where(c => c.BlogId == BlogId).ToList();
+            Guid guid = Guid.Parse(Blogid.name);
+
+            var comments = _db.Comments.Where(c => c.BlogId == guid).ToList();
             return Ok(comments);
         }
         [HttpDelete]

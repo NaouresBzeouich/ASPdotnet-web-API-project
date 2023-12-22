@@ -6,6 +6,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.DotNet.Scaffolding.Shared.Messaging;
 using System;
+using System.Data.SqlTypes;
 
 namespace Project_back_end.Controllers
 {
@@ -51,11 +52,13 @@ namespace Project_back_end.Controllers
         }
 
         // gets a blog with its id     
-        [HttpGet]
-        [Route("/getBlog/{id}")]
-        public async Task<Blog> GetBlog([FromRoute] Guid id)
+        [HttpPost]
+        [Route("/getBlog")]
+        public async Task<Blog> GetBlog([FromBody] testModel id)
         {
-            var blog = await _DbBlogsContext.Blogs.FindAsync(id);
+            Guid guid = Guid.Parse(id.name);
+
+            var blog = await _DbBlogsContext.Blogs.FindAsync(guid);
 
             // si le blog Id n'existe pas
             if (blog == null)
@@ -78,7 +81,7 @@ namespace Project_back_end.Controllers
             return blogs;
 
         }
-
+        
         // post(add) a new blog
         [HttpPost]
         [Route("/createBlog")]
@@ -87,8 +90,9 @@ namespace Project_back_end.Controllers
         {
             _logger.LogInformation("inside the action !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
             string guidString = newBlog.UserId?.ToString();
+            Guid guidid = Guid.Parse(newBlog.UserId);
 
-            var user = await _DbBlogsContext.users.FirstOrDefaultAsync(x => (x.Id == guidString));
+            //     var user = await _DbBlogsContext.users.FirstOrDefaultAsync(x => (x.Id == guidString));
             try
             {
 
@@ -98,8 +102,8 @@ namespace Project_back_end.Controllers
                     Image = newBlog.Image,
                     Title = newBlog.Title,
                     CategorieId = newBlog.CategoryId,
-                    UserId = newBlog.UserId,
-                    User = user
+                    UserId = guidid,
+                   // User = user
                 };
                 await _DbBlogsContext.Blogs.AddAsync(Blog);
 
@@ -131,7 +135,7 @@ namespace Project_back_end.Controllers
 
 
         }
-
+        
         // delete a blog by its id 
         [HttpDelete]
         [Route("/delete/{id}")]
@@ -185,16 +189,17 @@ namespace Project_back_end.Controllers
         }
 
         // get blogs by its owner id 
+        /*
         [HttpPost]
         [Route("/getBlogsByUser")]
         public async Task<IEnumerable<Blog>> getBlogsByUser([FromBody] testModel userId)
         {
-            string id = Guid.Parse(userId.name).ToString();
+            Guid id = Guid.Parse(userId.name);
             var blogs = _DbBlogsContext.Blogs.Where(Blog => Blog.UserId == id);
             return blogs;
         }
 
-
+        */
         // get blogs by category
         [HttpPost]
         [Route("/getBlogsByCategory")]

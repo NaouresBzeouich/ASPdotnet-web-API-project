@@ -33,4 +33,12 @@
 	  <Folder Include="wwwroot\Uploads\Blogs\" />
 	</ItemGroup>
 
+	<ItemGroup>
+	  <EditorConfigFiles Remove="D:\web dev\back-3\.editorconfig" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <None Include="D:\web dev\back-3\.editorconfig" />
+	</ItemGroup>
+
 </Project>

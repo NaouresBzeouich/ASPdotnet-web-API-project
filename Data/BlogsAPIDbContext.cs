@@ -12,7 +12,7 @@ namespace Project_back_end.Data
 
         public DbSet<Categorie> Categories { get; set; }
 
-        public DbSet<User> users { get; set; }
+       public DbSet<User> users { get; set; }
         public BlogsAPIDbContext(DbContextOptions<BlogsAPIDbContext> options) : base(options)
         {
             // Constructor logic
