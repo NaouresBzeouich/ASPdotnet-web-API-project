@@ -79,6 +79,47 @@ namespace Project_back_end.Controllers
             return Ok(comment);
 
         }
+        [HttpPut]
+        [Route("/likeComment/{id}")]
+        public async Task<IActionResult> LikeComment([FromRoute] Guid id)
+        {
+            var comment = await _db.Comments.FindAsync(id);
+
+
+            if (comment == null)
+            {
+                return NotFound("no comment to begin with");
+            }
+
+
+            comment.Likes ++;
+
+            await _db.SaveChangesAsync();
+
+            return Ok(comment);
+
+        }
+        [HttpPut]
+        [Route("/dislikeComment/{id}")]
+        public async Task<IActionResult> DislikeComment([FromRoute] Guid id)
+        {
+            var comment = await _db.Comments.FindAsync(id);
+
+
+            if (comment == null)
+            {
+                return NotFound("no comment to begin with");
+            }
+
+
+            comment.Dislikes++;
+
+            await _db.SaveChangesAsync();
+
+            return Ok(comment);
+
+        }
+
         [HttpPost]
 
         public async Task<IActionResult> Index()
