@@ -31,6 +31,7 @@ namespace Project_back_end.Controllers
         [HttpPost("getUserById")]
         public async Task<IActionResult> GetUserById( [FromBody]  testModel id )
         {
+            id.name = "25a1c76a-f6f5-4e22-8851-4aabbf33265d";
             var user = await _userManager.FindByIdAsync(id.name);
 
             if (user != null)

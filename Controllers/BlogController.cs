@@ -54,23 +54,64 @@ namespace Project_back_end.Controllers
         // gets a blog with its id     
         [HttpPost]
         [Route("/getBlog")]
-        public async Task<Blog> GetBlog([FromBody] testModel id)
+        public async Task<IActionResult> GetBlog([FromBody] testModel id)
         {
             Guid guid = Guid.Parse(id.name);
+            //_logger.LogInformation(guid);
 
-            var blog = await _DbBlogsContext.Blogs.FindAsync(guid);
+
+            //   var blog = await _DbBlogsContext.Blogs.FindAsync(guid);
+            var blog = await _DbBlogsContext.Blogs.FirstOrDefaultAsync(x=>x.Id==guid);
+
 
             // si le blog Id n'existe pas
             if (blog == null)
             {
-                return null; // 5alit'ha bech be3id bech terja lel move elli 9bel'ha nrmlmnt avec un error msg 
+                return NotFound(); // 5alit'ha bech be3id bech terja lel move elli 9bel'ha nrmlmnt avec un error msg 
             }
 
             blog.Image = getImageByBlog(blog.Id);
             await _DbBlogsContext.SaveChangesAsync();
 
-            return blog;
+            return Ok(blog)
+                    ;
         }
+
+
+
+        [HttpPost]
+        [Route("/getBlogsByUserId")]
+        public async Task<IActionResult> GetBlogsByUserId([FromBody] testModel id)
+        {
+            Guid guid = Guid.Parse(id.name);
+            //_logger.LogInformation(guid);
+
+
+            //   var blog = await _DbBlogsContext.Blogs.FindAsync(guid);
+            var blogs = await _DbBlogsContext.Blogs.Where(x => x.UserId == guid).ToListAsync();
+
+
+            // si le blog Id n'existe pas
+            if (blogs == null)
+            {
+                return NotFound(new
+                {
+
+                    Message= "no blogs found !"
+
+
+                }
+                    ); // 5alit'ha bech be3id bech terja lel move elli 9bel'ha nrmlmnt avec un error msg 
+            }
+
+            await _DbBlogsContext.SaveChangesAsync();
+
+            return Ok(blogs)
+                    ;
+        }
+
+
+
 
         // gets the trending blogs (the top 10 blogs that have the biggest likes number  ) 
         [HttpGet]
@@ -206,7 +247,8 @@ namespace Project_back_end.Controllers
         public async Task<IEnumerable<Blog>> getBlogsByCategory(Categorie Category)
         {
             IEnumerable<Blog> blogs = _DbBlogsContext.Blogs.Where(Blog => Blog.CategorieId == Category.Id);
-            return blogs;
+           
+            return blogs;  
 
         }
 
