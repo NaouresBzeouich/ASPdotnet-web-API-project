@@ -129,7 +129,7 @@ namespace Project_back_end.Controllers
 
         public async Task<IActionResult> Create([FromBody] CreateBlogRequest newBlog)
         {
-            _logger.LogInformation("inside the action !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
+           // _logger.LogInformation("inside the action !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
             string guidString = newBlog.UserId?.ToString();
             Guid guidid = Guid.Parse(newBlog.UserId);
 
@@ -228,6 +228,65 @@ namespace Project_back_end.Controllers
             return blog;
 
         }
+
+
+
+
+
+
+
+        [HttpPut]
+        [Route("/likeBlog")]
+        public async Task<IActionResult> likeBlog([FromBody] testModel id)
+        {
+            Guid guid = Guid.Parse(id.name);
+
+            var blog = await _DbBlogsContext.Blogs.FindAsync(guid);
+
+            if (blog == null)
+            {
+                return NotFound();    
+            }
+
+                blog.Likes ++;
+            
+          
+            await _DbBlogsContext.SaveChangesAsync();
+
+            return Ok(blog);
+
+        }
+
+
+        [HttpPut]
+        [Route("/dislikeBlog")]
+        public async Task<IActionResult> dislikeBlog([FromBody] testModel id)
+        {
+          //  id.name = "829727c4-1a3a-4904-c596-08dc079e9fae";
+            Guid guid = Guid.Parse(id.name);
+
+           // id.name = "9b7d1552-14ac-4613-9b0d-08dc14edc7a1";
+            var blog = await _DbBlogsContext.Blogs.FindAsync(guid);
+
+            if (blog == null)
+            {
+                return NotFound();
+            }
+
+
+
+            blog.Dislikes++;
+
+
+            await _DbBlogsContext.SaveChangesAsync();
+
+            return Ok(blog);
+
+        }
+
+
+
+
 
         // get blogs by its owner id 
         /*

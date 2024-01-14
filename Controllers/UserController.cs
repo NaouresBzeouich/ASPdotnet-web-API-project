@@ -13,9 +13,12 @@ namespace Project_back_end.Controllers
         private readonly BlogsAPIDbContext _dbContext;
         private readonly UserManager<User> _userManager;
         private readonly RoleManager<IdentityRole> _roleManager;
+        private readonly ILogger<BlogController> _logger;
 
-        public UserController(UserManager<User> userManager, RoleManager<IdentityRole> roleManager, BlogsAPIDbContext dbContext)
+
+        public UserController(UserManager<User> userManager, ILogger<BlogController> logger, RoleManager<IdentityRole> roleManager, BlogsAPIDbContext dbContext)
         {
+            _logger = logger;
             _userManager = userManager;
             _roleManager = roleManager;
             _dbContext = dbContext;
@@ -29,10 +32,9 @@ namespace Project_back_end.Controllers
         }
 
         [HttpPost("getUserById")]
-        public async Task<IActionResult> GetUserById( [FromBody]  testModel id )
+        public async Task<IActionResult> GetUserById(   testModel id )
         {
-            id.name = "25a1c76a-f6f5-4e22-8851-4aabbf33265d";
-            var user = await _userManager.FindByIdAsync(id.name);
+          var user = await _userManager.FindByIdAsync(id.name);
 
             if (user != null)
             {
