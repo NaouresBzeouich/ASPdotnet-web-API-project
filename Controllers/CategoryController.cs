@@ -53,8 +53,8 @@ namespace Project_back_end.Controllers
         [Route("/getCategoryByName")]
         public async Task<IActionResult> getCategoryByName(testModel cat)
         {
-            var categorie = await _dbContext.Categories.FirstOrDefaultAsync(c => c.Name==cat.name);
-            if (categorie == null)
+            var category = await _dbContext.Categories.FirstOrDefaultAsync(c => c.Name==cat.name);
+            if (category == null)
             {
                 return NotFound(new
                 {
@@ -63,15 +63,27 @@ namespace Project_back_end.Controllers
                 }) ; // change it if you have another case when there's no category with that name
             }
             
-            return Ok(new
-            {
-                id= categorie.Id,
-                name= categorie.Name,
-                StatusCode=200,
-
-            });
+            return Ok(category);
         }
 
+
+        [HttpPost]
+        [Route("/getCategoryById")]
+        public async Task<IActionResult> getCategoryById(testModel cat)
+        {
+            int catid = int.Parse(cat.name);
+            var category = await _dbContext.Categories.FirstOrDefaultAsync(c => c.Id == catid);
+            if (category == null)
+            {
+                return NotFound(new
+                {
+                    Message = "category not found",
+                    namepassedby = cat.name
+                }); // change it if you have another case when there's no category with that name
+            }
+
+            return Ok(category);
+        }
 
 
     }

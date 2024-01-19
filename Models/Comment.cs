@@ -11,7 +11,7 @@ namespace Project_back_end.Models
         public int? Dislikes { get; set; }
         public virtual User Author { get; set; }
         [ForeignKey ("Author")]
-        public string? UserId { get; set; }
+        public String? UserId { get; set; }
         public virtual Blog AssociatedBlog { get; set; }
         [ForeignKey ("AssociatedBlog")]
         public Guid? BlogId { get; set; }
@@ -20,7 +20,7 @@ namespace Project_back_end.Models
             Likes = 0;
             Dislikes = 0;
         }
-
+        public DateTime? creationDate { get; set; }  
 
     }
 }

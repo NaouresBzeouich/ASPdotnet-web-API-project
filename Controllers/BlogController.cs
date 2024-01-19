@@ -61,7 +61,7 @@ namespace Project_back_end.Controllers
 
 
             //   var blog = await _DbBlogsContext.Blogs.FindAsync(guid);
-            var blog = await _DbBlogsContext.Blogs.FirstOrDefaultAsync(x=>x.Id==guid);
+            var blog = await _DbBlogsContext.Blogs.FirstOrDefaultAsync(x => x.Id == guid);
 
 
             // si le blog Id n'existe pas
@@ -88,7 +88,7 @@ namespace Project_back_end.Controllers
 
 
             //   var blog = await _DbBlogsContext.Blogs.FindAsync(guid);
-            var blogs = await _DbBlogsContext.Blogs.Where(x => x.UserId == guid).ToListAsync();
+            var blogs = await _DbBlogsContext.Blogs.Where(x => x.UserId == id.name).ToListAsync();
 
 
             // si le blog Id n'existe pas
@@ -97,7 +97,7 @@ namespace Project_back_end.Controllers
                 return NotFound(new
                 {
 
-                    Message= "no blogs found !"
+                    Message = "no blogs found !"
 
 
                 }
@@ -122,14 +122,14 @@ namespace Project_back_end.Controllers
             return blogs;
 
         }
-        
+
         // post(add) a new blog
         [HttpPost]
         [Route("/createBlog")]
 
         public async Task<IActionResult> Create([FromBody] CreateBlogRequest newBlog)
         {
-           // _logger.LogInformation("inside the action !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
+            // _logger.LogInformation("inside the action !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
             string guidString = newBlog.UserId?.ToString();
             Guid guidid = Guid.Parse(newBlog.UserId);
 
@@ -143,8 +143,8 @@ namespace Project_back_end.Controllers
                     Image = newBlog.Image,
                     Title = newBlog.Title,
                     CategorieId = newBlog.CategoryId,
-                    UserId = guidid,
-                   // User = user
+                    UserId = newBlog.UserId,
+                    // User = user
                 };
                 await _DbBlogsContext.Blogs.AddAsync(Blog);
 
@@ -176,7 +176,7 @@ namespace Project_back_end.Controllers
 
 
         }
-        
+
         // delete a blog by its id 
         [HttpDelete]
         [Route("/delete/{id}")]
@@ -237,36 +237,13 @@ namespace Project_back_end.Controllers
 
         [HttpPut]
         [Route("/likeBlog")]
-        public async Task<IActionResult> likeBlog([FromBody] testModel id)
+        public async Task<IActionResult> likeBlog([FromBody] LikingRequest likeRequest)
         {
-            Guid guid = Guid.Parse(id.name);
-
-            var blog = await _DbBlogsContext.Blogs.FindAsync(guid);
-
-            if (blog == null)
-            {
-                return NotFound();    
-            }
-
-                blog.Likes ++;
-            
-          
-            await _DbBlogsContext.SaveChangesAsync();
-
-            return Ok(blog);
-
-        }
+            Guid blogId = Guid.Parse(likeRequest.EntityId);
+            Guid UserId = Guid.Parse(likeRequest.UserId);
 
 
-        [HttpPut]
-        [Route("/dislikeBlog")]
-        public async Task<IActionResult> dislikeBlog([FromBody] testModel id)
-        {
-          //  id.name = "829727c4-1a3a-4904-c596-08dc079e9fae";
-            Guid guid = Guid.Parse(id.name);
-
-           // id.name = "9b7d1552-14ac-4613-9b0d-08dc14edc7a1";
-            var blog = await _DbBlogsContext.Blogs.FindAsync(guid);
+            var blog = await _DbBlogsContext.Blogs.FindAsync(blogId);
 
             if (blog == null)
             {
@@ -274,42 +251,179 @@ namespace Project_back_end.Controllers
             }
 
 
+            var like = await _DbBlogsContext.BlogLikes.FirstOrDefaultAsync(x => x.BlogId == blogId
+            && x.UserId== UserId);
 
-            blog.Dislikes++;
+            if (like == null)
+            {
+                var BlogLike = new BlogLikes()
+                {
+                    BlogId = blogId,
+                    UserId = UserId,
+                    // User = user
+                };
+                await _DbBlogsContext.BlogLikes.AddAsync(BlogLike);
+
+                blog.Likes++;
 
 
-            await _DbBlogsContext.SaveChangesAsync();
+                await _DbBlogsContext.SaveChangesAsync();
 
-            return Ok(blog);
+                return Ok(new
+                {
+                    Message = "like"
+                });
+            }
+            else
+            {
+
+                _DbBlogsContext.BlogLikes.Remove(like);
+                blog.Likes--;
+
+                await _DbBlogsContext.SaveChangesAsync();
+
+                return Ok(new
+                {
+                    Message = "unlike "
+                });
+
+            }
+
+
 
         }
 
 
-
-
-
-        // get blogs by its owner id 
-        /*
-        [HttpPost]
-        [Route("/getBlogsByUser")]
-        public async Task<IEnumerable<Blog>> getBlogsByUser([FromBody] testModel userId)
+        [HttpPut]
+        [Route("/dislikeBlog")]
+        public async Task<IActionResult> dislikeBlog([FromBody] LikingRequest likeRequest)
         {
-            Guid id = Guid.Parse(userId.name);
-            var blogs = _DbBlogsContext.Blogs.Where(Blog => Blog.UserId == id);
-            return blogs;
+           
+                Guid blogId = Guid.Parse(likeRequest.EntityId);
+                Guid UserId = Guid.Parse(likeRequest.UserId);
+
+
+                var blog = await _DbBlogsContext.Blogs.FindAsync(blogId);
+
+                if (blog == null)
+                {
+                    return NotFound();
+                }
+
+
+                var dislike = await _DbBlogsContext.BlogDislikes.FirstOrDefaultAsync(x => x.BlogId == blogId
+                && x.UserId == UserId);
+
+                if (dislike == null)
+                {
+                    var BlogDislike = new BlogDislikes()
+                    {
+                        BlogId = blogId,
+                        UserId = UserId,
+                    };
+                    await _DbBlogsContext.BlogDislikes.AddAsync(BlogDislike);
+
+                    blog.Dislikes++;
+
+
+                    await _DbBlogsContext.SaveChangesAsync();
+
+                    return Ok(new
+                    {
+                        Message = "dislike"
+                    });
+                }
+                else
+                {
+
+                    _DbBlogsContext.BlogDislikes.Remove(dislike);
+                    blog.Dislikes--;
+
+                    await _DbBlogsContext.SaveChangesAsync();
+
+                    return Ok(new
+                    {
+                        Message = "undislike "
+                    });
+
+                }
+
+
+
+            }
+
+
+
+        [HttpPost]
+        [Route("/getBlogLikes")]
+        public async Task<IActionResult> getBlogLikes([FromBody] LikingRequest likeRequest)
+        {
+
+            Guid blogId = Guid.Parse(likeRequest.EntityId);
+            Guid UserId = Guid.Parse(likeRequest.UserId);
+
+
+            var blog = await _DbBlogsContext.Blogs.FindAsync(blogId);
+
+            if (blog == null)
+            {
+                return NotFound();
+            }
+
+            var like = await _DbBlogsContext.BlogLikes.FirstOrDefaultAsync(x => x.BlogId == blogId
+            && x.UserId == UserId);
+
+            var dislike = await _DbBlogsContext.BlogDislikes.FirstOrDefaultAsync(x => x.BlogId == blogId
+            && x.UserId == UserId);
+
+            return Ok(new
+            {
+likes=(like!=null),
+dislikes=(dislike!=null),
+
+            });
+
         }
 
-        */
-        // get blogs by category
+
+
+
+
+
         [HttpPost]
         [Route("/getBlogsByCategory")]
-        public async Task<IEnumerable<Blog>> getBlogsByCategory(Categorie Category)
+        public async Task<IActionResult> getBlogsByCategory(testModel category)
         {
-            IEnumerable<Blog> blogs = _DbBlogsContext.Blogs.Where(Blog => Blog.CategorieId == Category.Id);
-           
-            return blogs;  
+            int catId = int.Parse(category.name);
+
+            IEnumerable<Blog> blogs = _DbBlogsContext.Blogs.Where(Blog => Blog.CategorieId == catId);
+
+            return Ok(blogs);
 
         }
+
+
+
+
+
+        [HttpPost]
+        [Route("/getBlogsByCategoryName")]
+        public async Task<IActionResult> getBlogsByCategoryName(testModel category)
+        {
+            var cat = await _DbBlogsContext.Categories.FirstOrDefaultAsync(x => x.Name == category.name);
+            if (cat == null)
+            {
+                return NotFound();
+            }
+
+            IEnumerable<Blog> blogs = _DbBlogsContext.Blogs.Where(Blog => Blog.CategorieId == cat.Id);
+
+            return Ok(blogs);
+
+        }
+
+
+
 
         // image management : 
 

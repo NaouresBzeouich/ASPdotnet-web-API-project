@@ -25,7 +25,7 @@ namespace Project_back_end.Models
         [JsonIgnore]
         public virtual User User { get; set; }
         
-        public Guid? UserId { get; set; }
+        public String? UserId { get; set; }
 
 
 
