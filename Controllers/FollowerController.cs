@@ -86,7 +86,13 @@ namespace Project_back_end.Controllers
                 return NotFound();
 
             }
+            var oldConnection= await _Db.Followers.FirstOrDefaultAsync(x => x.FollowerId == id.EntityId
+            && x.FollowingId==id.UserId );
 
+            if( oldConnection != null)
+            {
+                return Ok();
+            }
             var connection = new followers()
             {
                 FollowerId = id.EntityId,
@@ -105,7 +111,7 @@ namespace Project_back_end.Controllers
 
 
 
-        [HttpPut]
+        [HttpPost]
         [Route("/Unfollow")]
         public async Task<IActionResult> Unfollow(LikingRequest id)
         {

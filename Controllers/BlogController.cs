@@ -178,23 +178,46 @@ namespace Project_back_end.Controllers
         }
 
         // delete a blog by its id 
-        [HttpDelete]
-        [Route("/delete/{id}")]
-        public async Task<Blog> Delete(Guid id)
+        [HttpPost]
+        [Route("/deleteBlog")]
+        public async Task<IActionResult> Delete(testModel id)
         {
-            var blog = await _DbBlogsContext.Blogs.FindAsync(id);
+            Guid guidId = Guid.Parse(id.name);
+            var blog = await _DbBlogsContext.Blogs.FindAsync(guidId);
 
             // si le blog Id n'existe pas
             if (blog == null)
             {
-                return null; // mbe3id bech inredirectiha lel api necessary 
+                return NotFound(); // mbe3id bech inredirectiha lel api necessary 
             }
             _DbBlogsContext.Remove(blog);
             await _DbBlogsContext.SaveChangesAsync();
-            return blog;
+            return Ok();
 
 
         }
+
+
+        [HttpPost]
+        [Route("/addView")]
+        public async Task<IActionResult> addView(testModel id)
+        {
+            Guid guidId = Guid.Parse(id.name);
+            var blog = await _DbBlogsContext.Blogs.FindAsync(guidId);
+
+            // si le blog Id n'existe pas
+            if (blog == null)
+            {
+                return NotFound(); // mbe3id bech inredirectiha lel api necessary 
+            }
+
+            blog.Views++;
+            await _DbBlogsContext.SaveChangesAsync();
+            return Ok();
+
+
+        }
+
 
         // update the blog by its id 
         [HttpPut]
