@@ -9,10 +9,16 @@ namespace Project_back_end.Data
     {
         public DbSet<Blog> Blogs { get; set; }
         public DbSet<Comment> Comments { get; set; }
+        public DbSet<BlogLikes> BlogLikes { get; set; }
+        public DbSet<BlogDislikes> BlogDislikes { get; set; }
+
+        public DbSet<CommentLikes> CommentLikes { get; set; }
+        public DbSet<CommentDislikes> CommentDislikes { get; set; }
+        public DbSet<followers> Followers { get; set; }
 
         public DbSet<Categorie> Categories { get; set; }
 
-        public DbSet<User> users { get; set; }
+       public DbSet<User> users { get; set; }
         public BlogsAPIDbContext(DbContextOptions<BlogsAPIDbContext> options) : base(options)
         {
             // Constructor logic
@@ -21,6 +27,8 @@ namespace Project_back_end.Data
         {
             optionsBuilder.UseLazyLoadingProxies();
         }
+
+     
 
 
     }

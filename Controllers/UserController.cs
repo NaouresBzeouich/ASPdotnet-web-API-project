@@ -13,9 +13,12 @@ namespace Project_back_end.Controllers
         private readonly BlogsAPIDbContext _dbContext;
         private readonly UserManager<User> _userManager;
         private readonly RoleManager<IdentityRole> _roleManager;
+        private readonly ILogger<BlogController> _logger;
 
-        public UserController(UserManager<User> userManager, RoleManager<IdentityRole> roleManager, BlogsAPIDbContext dbContext)
+
+        public UserController(UserManager<User> userManager, ILogger<BlogController> logger, RoleManager<IdentityRole> roleManager, BlogsAPIDbContext dbContext)
         {
+            _logger = logger;
             _userManager = userManager;
             _roleManager = roleManager;
             _dbContext = dbContext;
@@ -28,10 +31,10 @@ namespace Project_back_end.Controllers
             return Ok(users);
         }
 
-        [HttpGet("{id}")]
-        public async Task<IActionResult> GetUserById(string id)
+        [HttpPost("getUserById")]
+        public async Task<IActionResult> GetUserById(   testModel id )
         {
-            var user = await _userManager.FindByIdAsync(id);
+          var user = await _userManager.FindByIdAsync(id.name);
 
             if (user != null)
             {
@@ -42,35 +45,70 @@ namespace Project_back_end.Controllers
         }
 
 
-        [HttpGet("{id}/blogs")]
-        public async Task<IActionResult> GetUserBlogs(string id)
+        [HttpPost("getUserCounts")]
+        public async Task<IActionResult> getUserCounts(testModel id)
         {
-            var user = await _dbContext.users.Include(u => u.Blogs).FirstOrDefaultAsync(u => u.Id == id);
+            var user = await _userManager.FindByIdAsync(id.name);
 
-            if (user != null)
+            if (user == null)
             {
-                return Ok(user.Blogs);
+                return NotFound();
             }
 
-            return NotFound(); // User with the given ID not found
+            var followersCount = await _dbContext.Followers.CountAsync(x => x.FollowingId == id.name);
+            var followingsCount = await _dbContext.Followers.CountAsync(x => x.FollowerId == id.name);
+            var blogs = await _dbContext.Blogs.Where(x => x.UserId == id.name).ToListAsync();
+            var blogsCounts = blogs.Count();
+            int totalLikes = (int)blogs.Sum(blog => blog.Likes);
+
+
+
+          
+
+            return Ok(new
+            {
+followers=followersCount,
+followings=followingsCount,
+blogs=blogsCounts,
+likes=totalLikes
+
+
+            }); // User with the given ID not found
         }
 
-        [HttpPost]
-        public async Task<IActionResult> CreateUser(User user)
-        {
-            if (ModelState.IsValid) // Validate the model state
-            {
-                var result = await _userManager.CreateAsync(user);
-                if (result.Succeeded)
+
+
+
+        /*
+                [HttpGet("{id}/blogs")]
+                public async Task<IActionResult> GetUserBlogs(string id)
                 {
-                    return Ok(new { Message = "User created successfully." });
+                    var user= await _dbContext.users.Include(u => u.Blogs).FirstOrDefaultAsync(u => u.Id == id);
+
+                    if (user != null)
+                    {
+                        return Ok(user.Blogs);
+                    }
+
+                    return NotFound(); // User with the given ID not found
                 }
 
-                return BadRequest(new { Errors = result.Errors });
-            }
+                [HttpPost]
+                public async Task<IActionResult> CreateUser(User user)
+                {
+                    if (ModelState.IsValid) // Validate the model state
+                    {
+                        var result = await _userManager.CreateAsync(user);
+                        if (result.Succeeded)
+                        {
+                            return Ok(new { Message = "User created successfully." });
+                        }
 
-            return BadRequest(ModelState); // Return validation errors
-        }
+                        return BadRequest(new { Errors = result.Errors });
+                    }
+
+                    return BadRequest(ModelState); // Return validation errors
+                }*/
 
         [HttpPut("{id}")]
         public async Task<IActionResult> UpdateUser(string id, [FromBody] User updatedUser)
@@ -97,8 +135,8 @@ namespace Project_back_end.Controllers
                     existingUser.LockoutEnabled = updatedUser.LockoutEnabled;
                 if (updatedUser.AccessFailedCount != null)
                     existingUser.AccessFailedCount = updatedUser.AccessFailedCount;
-                if (updatedUser.Bio != null)
-                    existingUser.Bio = updatedUser.Bio;
+              //  if (updatedUser.Bio != null)
+               //     existingUser.Bio = updatedUser.Bio;
 
                 var result = await _userManager.UpdateAsync(existingUser);
                 if (result.Succeeded)
