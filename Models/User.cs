@@ -5,14 +5,16 @@ namespace Project_back_end.Models
 {
     public class User : IdentityUser
     {
-      public string? Bio { get; set; }
-      public DateTimeOffset JoinDate { get; set; } = DateTimeOffset.Now;
+        public string? Bio { get; set; }
+        public DateTimeOffset JoinDate { get; set; } = DateTimeOffset.Now;
         // User has blogs :
         [JsonIgnore]
         public virtual ICollection<Blog>? Blogs { get; set; }
         // User has comments :
 
+        //User has image :
+        public string? Image { get; set; }
 
     }
-    
+
 }

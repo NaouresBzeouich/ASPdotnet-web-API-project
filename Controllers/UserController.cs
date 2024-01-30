@@ -14,14 +14,15 @@ namespace Project_back_end.Controllers
         private readonly UserManager<User> _userManager;
         private readonly RoleManager<IdentityRole> _roleManager;
         private readonly ILogger<BlogController> _logger;
+        private readonly IWebHostEnvironment _environment;
 
-
-        public UserController(UserManager<User> userManager, ILogger<BlogController> logger, RoleManager<IdentityRole> roleManager, BlogsAPIDbContext dbContext)
+        public UserController(UserManager<User> userManager, ILogger<BlogController> logger, RoleManager<IdentityRole> roleManager, BlogsAPIDbContext dbContext, IWebHostEnvironment environment)
         {
             _logger = logger;
             _userManager = userManager;
             _roleManager = roleManager;
             _dbContext = dbContext;
+            _environment = environment;
         }
 
         [HttpGet]
@@ -32,9 +33,9 @@ namespace Project_back_end.Controllers
         }
 
         [HttpPost("getUserById")]
-        public async Task<IActionResult> GetUserById(   testModel id )
+        public async Task<IActionResult> GetUserById(testModel id)
         {
-          var user = await _userManager.FindByIdAsync(id.name);
+            var user = await _userManager.FindByIdAsync(id.name);
 
             if (user != null)
             {
@@ -63,14 +64,14 @@ namespace Project_back_end.Controllers
 
 
 
-          
+
 
             return Ok(new
             {
-followers=followersCount,
-followings=followingsCount,
-blogs=blogsCounts,
-likes=totalLikes
+                followers = followersCount,
+                followings = followingsCount,
+                blogs = blogsCounts,
+                likes = totalLikes
 
 
             }); // User with the given ID not found
@@ -135,8 +136,8 @@ likes=totalLikes
                     existingUser.LockoutEnabled = updatedUser.LockoutEnabled;
                 if (updatedUser.AccessFailedCount != null)
                     existingUser.AccessFailedCount = updatedUser.AccessFailedCount;
-              //  if (updatedUser.Bio != null)
-               //     existingUser.Bio = updatedUser.Bio;
+                //  if (updatedUser.Bio != null)
+                //     existingUser.Bio = updatedUser.Bio;
 
                 var result = await _userManager.UpdateAsync(existingUser);
                 if (result.Succeeded)
@@ -232,6 +233,94 @@ likes=totalLikes
             {
                 return BadRequest(result.Errors);
             }
+        }
+
+        [HttpPost]
+        [Route("ImageUpload")]
+        public async Task<IActionResult> ImageUpload([FromForm] ImageModel imageModel)
+        {
+
+            var user = await _userManager.FindByIdAsync(imageModel.BlogId.ToString());
+
+            if (user == null)
+            {
+                return NotFound("User not found ! ");
+            }
+            try
+            {
+                string Filepath = this._environment.WebRootPath + "\\Uploads\\Profiles\\" + imageModel.BlogId;
+                if (!System.IO.Directory.Exists(Filepath))
+                {
+                    System.IO.Directory.CreateDirectory(Filepath);
+                }
+                string imagepath = Filepath + "\\image.png";
+                if (System.IO.File.Exists(imagepath))  // so you can use this also when you wanna update the image 
+                {
+                    System.IO.File.Delete(imagepath);
+                }
+
+                using (Stream stream = new FileStream(imagepath, FileMode.Create))
+                {
+                    imageModel.Image.CopyTo(stream);
+                }
+
+                user.Image = getImageByUser(imageModel.BlogId);
+                await _userManager.UpdateAsync(user);
+
+                return Ok(user);
+
+            }
+            catch (Exception ex)
+            {
+                return BadRequest("error in uploading the image !" + ex.Message);
+            }
+
+        }
+
+        [HttpDelete]
+        [Route("ImageRemove")]
+        public async Task<IActionResult> removeImage(string userId)
+        {
+            string HostURL = $"{this.Request.Scheme}://{this.Request.Host}{this.Request.PathBase}/";
+            string Filepath = _environment.WebRootPath + "\\Uploads\\Profiles\\" + userId;
+            string imagepath = Filepath + "\\image.png";
+            var user = await _userManager.FindByIdAsync(userId);
+
+            if (System.IO.Directory.Exists(Filepath))
+            {
+                System.IO.File.Delete(imagepath);
+                System.IO.Directory.Delete(Filepath);
+
+                user.Image = HostURL + "commun/noImage.jpg";
+                await _userManager.UpdateAsync(user);
+                return Ok();
+            }
+            else
+            {
+                return NotFound();
+            }
+        }
+
+
+        // this action to let the attribue image in blog  an URL 
+        [NonAction]
+        private string getImageByUser(Guid userId)
+        {
+            string HostURL = $"{this.Request.Scheme}://{this.Request.Host}{this.Request.PathBase}/";
+            string Filepath = _environment.WebRootPath + "\\Uploads\\Profiles\\" + userId;
+            //_ = Filepath + "\\image.png";
+
+            string imageURL;
+            if (!System.IO.Directory.Exists(Filepath))
+            {
+                imageURL = HostURL + "commun/noImage.jpg";
+            }
+            else
+            {
+                imageURL = HostURL + "Uploads/Profiles/" + userId + "/image.png";
+            }
+
+            return imageURL;
         }
 
 
