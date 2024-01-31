@@ -11,9 +11,13 @@ namespace Project_back_end.Controllers
     public class CategoryController : ControllerBase
     {
         private readonly BlogsAPIDbContext _dbContext;
+        private readonly ILogger<BlogController> _logger;
 
-        public CategoryController(BlogsAPIDbContext dbContext)
+
+        public CategoryController(BlogsAPIDbContext dbContext, ILogger<BlogController> logger)
         {
+            _logger = logger;
+
             _dbContext = dbContext;
         }
 
@@ -71,20 +75,21 @@ namespace Project_back_end.Controllers
         [Route("/getCategoryById")]
         public async Task<IActionResult> getCategoryById(testModel cat)
         {
-            int catid = int.Parse(cat.name);
-            var category = await _dbContext.Categories.FirstOrDefaultAsync(c => c.Id == catid);
-            if (category == null)
-            {
-                return NotFound(new
+           
+                int catid = int.Parse(cat.name);
+                var category = await _dbContext.Categories.FirstOrDefaultAsync(c => c.Id == catid);
+                if (category == null)
                 {
-                    Message = "category not found",
-                    namepassedby = cat.name
-                }); // change it if you have another case when there's no category with that name
+                    return NotFound(new
+                    {
+                        Message = "category not found",
+                        namepassedby = cat.name
+                    }); // change it if you have another case when there's no category with that name
+                }
+
+                return Ok(category);
             }
-
-            return Ok(category);
-        }
-
+        
 
     }
 }

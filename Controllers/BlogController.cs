@@ -232,6 +232,9 @@ namespace Project_back_end.Controllers
                 return null; // mbe3id netfehmou   
             }
 
+
+
+
             // on peut faire un mise à jour juste sur des colonnes specifiques
             if (updatedBlog.Title != null)
             {

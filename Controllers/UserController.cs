@@ -110,7 +110,7 @@ likes=totalLikes
                     return BadRequest(ModelState); // Return validation errors
                 }*/
 
-        [HttpPut("{id}")]
+        [HttpPut("/updateUser/{id}")]
         public async Task<IActionResult> UpdateUser(string id, [FromBody] User updatedUser)
         {
             var existingUser = await _userManager.FindByIdAsync(id);
@@ -135,8 +135,8 @@ likes=totalLikes
                     existingUser.LockoutEnabled = updatedUser.LockoutEnabled;
                 if (updatedUser.AccessFailedCount != null)
                     existingUser.AccessFailedCount = updatedUser.AccessFailedCount;
-              //  if (updatedUser.Bio != null)
-               //     existingUser.Bio = updatedUser.Bio;
+                if (updatedUser.Bio != null)
+                   existingUser.Bio = updatedUser.Bio;
 
                 var result = await _userManager.UpdateAsync(existingUser);
                 if (result.Succeeded)
