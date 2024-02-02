@@ -54,7 +54,7 @@ namespace Project_back_end.Controllers
         // gets a blog with its id     
         [HttpPost]
         [Route("/getBlog")]
-        public async Task<IActionResult> GetBlog([FromBody] testModel id)
+        public async Task<IActionResult> GetBlog([FromBody] @string id)
         {
             Guid guid = Guid.Parse(id.name);
             //_logger.LogInformation(guid);
@@ -81,7 +81,7 @@ namespace Project_back_end.Controllers
 
         [HttpPost]
         [Route("/getBlogsByUserId")]
-        public async Task<IActionResult> GetBlogsByUserId([FromBody] testModel id)
+        public async Task<IActionResult> GetBlogsByUserId([FromBody] @string id)
         {
             Guid guid = Guid.Parse(id.name);
             //_logger.LogInformation(guid);
@@ -180,7 +180,7 @@ namespace Project_back_end.Controllers
         // delete a blog by its id 
         [HttpPost]
         [Route("/deleteBlog")]
-        public async Task<IActionResult> Delete(testModel id)
+        public async Task<IActionResult> Delete(@string id)
         {
             Guid guidId = Guid.Parse(id.name);
             var blog = await _DbBlogsContext.Blogs.FindAsync(guidId);
@@ -200,7 +200,7 @@ namespace Project_back_end.Controllers
 
         [HttpPost]
         [Route("/addView")]
-        public async Task<IActionResult> addView(testModel id)
+        public async Task<IActionResult> addView(@string id)
         {
             Guid guidId = Guid.Parse(id.name);
             var blog = await _DbBlogsContext.Blogs.FindAsync(guidId);
@@ -418,7 +418,7 @@ dislikes=(dislike!=null),
 
         [HttpPost]
         [Route("/getBlogsByCategory")]
-        public async Task<IActionResult> getBlogsByCategory(testModel category)
+        public async Task<IActionResult> getBlogsByCategory(@string category)
         {
             int catId = int.Parse(category.name);
 
@@ -434,7 +434,7 @@ dislikes=(dislike!=null),
 
         [HttpPost]
         [Route("/getBlogsByCategoryName")]
-        public async Task<IActionResult> getBlogsByCategoryName(testModel category)
+        public async Task<IActionResult> getBlogsByCategoryName(@string category)
         {
             var cat = await _DbBlogsContext.Categories.FirstOrDefaultAsync(x => x.Name == category.name);
             if (cat == null)

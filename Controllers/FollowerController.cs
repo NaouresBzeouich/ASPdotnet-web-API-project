@@ -39,7 +39,7 @@ namespace Project_back_end.Controllers
 
         [HttpPost]
         [Route("/getFollowersById")]
-        public async Task<IActionResult> getFollowersById(testModel id)
+        public async Task<IActionResult> getFollowersById(@string id)
         {
             var followers = await _Db.Followers
                    .Where(x => x.FollowingId == id.name)
@@ -56,7 +56,7 @@ namespace Project_back_end.Controllers
 
         [HttpPost]
         [Route("/getFollowingsById")]
-        public async Task<IActionResult> getFollowingsById(testModel id)
+        public async Task<IActionResult> getFollowingsById(@string id)
         {
 
             var followings = await _Db.Followers

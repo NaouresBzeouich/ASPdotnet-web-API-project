@@ -31,10 +31,10 @@ namespace Project_back_end.Controllers
             return Ok(users);
         }
 
-        [HttpPost("getUserById")]
-        public async Task<IActionResult> GetUserById(   testModel id )
+        [HttpGet("getUserById/{id}")]
+        public async Task<IActionResult> GetUserById(   string id )
         {
-          var user = await _userManager.FindByIdAsync(id.name);
+          var user = await _userManager.FindByIdAsync(id);
 
             if (user != null)
             {
@@ -46,7 +46,7 @@ namespace Project_back_end.Controllers
 
 
         [HttpPost("getUserCounts")]
-        public async Task<IActionResult> getUserCounts(testModel id)
+        public async Task<IActionResult> getUserCounts(@string id)
         {
             var user = await _userManager.FindByIdAsync(id.name);
 
@@ -109,6 +109,8 @@ likes=totalLikes
 
                     return BadRequest(ModelState); // Return validation errors
                 }*/
+
+
 
         [HttpPut("/updateUser/{id}")]
         public async Task<IActionResult> UpdateUser(string id, [FromBody] User updatedUser)
@@ -233,6 +235,29 @@ likes=totalLikes
                 return BadRequest(result.Errors);
             }
         }
+
+
+
+        [HttpPatch("setBioEmptyString/{id}")]
+        public async Task<IActionResult> setBioEmptyString(string id)
+        {
+
+            var user = await _userManager.FindByIdAsync(id);
+            if (user == null)
+            
+                return NotFound(); // User with the given ID not found
+
+            
+
+          user.Bio = "";
+            await _dbContext.SaveChangesAsync();
+            return Ok();
+
+        }
+
+
+
+
 
 
     }

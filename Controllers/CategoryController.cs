@@ -24,7 +24,7 @@ namespace Project_back_end.Controllers
         // this is only to add some categories hawka 7outt eeli 7achtik bih be3id delete it 
         [HttpPost]
         [Route("/addCategory")]
-        public async Task<IActionResult> AddCategory(  testModel cat)
+        public async Task<IActionResult> AddCategory(  @string cat)
         {
             // Create new categories
             var category1 = new Categorie { Name = cat.name };
@@ -55,7 +55,7 @@ namespace Project_back_end.Controllers
 
         [HttpPost]
         [Route("/getCategoryByName")]
-        public async Task<IActionResult> getCategoryByName(testModel cat)
+        public async Task<IActionResult> getCategoryByName(@string cat)
         {
             var category = await _dbContext.Categories.FirstOrDefaultAsync(c => c.Name==cat.name);
             if (category == null)
@@ -73,7 +73,7 @@ namespace Project_back_end.Controllers
 
         [HttpPost]
         [Route("/getCategoryById")]
-        public async Task<IActionResult> getCategoryById(testModel cat)
+        public async Task<IActionResult> getCategoryById(@string cat)
         {
            
                 int catid = int.Parse(cat.name);
