@@ -20,6 +20,7 @@ namespace Project_back_end.Models
         // rate associated to the blog Somme(like : +1 ,dislike : -1)
         public int? Likes { get; set; }
         public int? Dislikes { get; set; }
+        public DateTime? CreationDate { get; set; }
 
         // association between Blog and its owner ( each bog has only one owner)
         [JsonIgnore]
