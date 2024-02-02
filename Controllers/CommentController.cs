@@ -70,7 +70,7 @@ namespace Project_back_end.Controllers
 
         [HttpPost]
         [Route("/getCommentById")]
-        public async Task<IActionResult> getCommentById(testModel id)
+        public async Task<IActionResult> getCommentById(@string id)
         {
 
             Guid guidId = Guid.Parse(id.name);
@@ -304,7 +304,7 @@ namespace Project_back_end.Controllers
       
         [HttpPost]
         [Route("/GetCommentsByBlog")]
-        public async Task<IActionResult> GetCommentsByBlogs([FromBody] testModel Blogid)
+        public async Task<IActionResult> GetCommentsByBlogs([FromBody] @string Blogid)
         {
             Guid guid = Guid.Parse(Blogid.name);
 

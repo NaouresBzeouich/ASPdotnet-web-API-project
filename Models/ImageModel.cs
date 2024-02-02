@@ -6,7 +6,8 @@ namespace Project_back_end.Models
     {
         public Guid BlogId { get; set; }
         
-        public IFormFile Image { get; set; }
+        public IFormFile? Image { get; set; }
 
+    
     }
 }

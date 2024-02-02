@@ -32,22 +32,23 @@ namespace Project_back_end.Controllers
             return Ok(users);
         }
 
-        [HttpPost("getUserById")]
-        public async Task<IActionResult> GetUserById(testModel id)
-        {
-            var user = await _userManager.FindByIdAsync(id.name);
 
-            if (user != null)
-            {
-                return Ok(user);
-            }
+      [HttpGet("getUserById/{id}")]
+ public async Task<IActionResult> GetUserById(   string id )
+ {
+   var user = await _userManager.FindByIdAsync(id);
 
-            return NotFound(); // User with the given ID not found
-        }
+     if (user != null)
+     {
+         return Ok(user);
+     }
+
+     return NotFound(); // User with the given ID not found
+ }
 
 
         [HttpPost("getUserCounts")]
-        public async Task<IActionResult> getUserCounts(testModel id)
+        public async Task<IActionResult> getUserCounts(@string id)
         {
             var user = await _userManager.FindByIdAsync(id.name);
 
@@ -111,7 +112,9 @@ namespace Project_back_end.Controllers
                     return BadRequest(ModelState); // Return validation errors
                 }*/
 
-        [HttpPut("{id}")]
+
+
+        [HttpPut("/updateUser/{id}")]
         public async Task<IActionResult> UpdateUser(string id, [FromBody] User updatedUser)
         {
             var existingUser = await _userManager.FindByIdAsync(id);
@@ -136,8 +139,10 @@ namespace Project_back_end.Controllers
                     existingUser.LockoutEnabled = updatedUser.LockoutEnabled;
                 if (updatedUser.AccessFailedCount != null)
                     existingUser.AccessFailedCount = updatedUser.AccessFailedCount;
+
                 //  if (updatedUser.Bio != null)
                 //     existingUser.Bio = updatedUser.Bio;
+
 
                 var result = await _userManager.UpdateAsync(existingUser);
                 if (result.Succeeded)
@@ -322,6 +327,29 @@ namespace Project_back_end.Controllers
 
             return imageURL;
         }
+
+
+
+        [HttpPatch("setBioEmptyString/{id}")]
+        public async Task<IActionResult> setBioEmptyString(string id)
+        {
+
+            var user = await _userManager.FindByIdAsync(id);
+            if (user == null)
+            
+                return NotFound(); // User with the given ID not found
+
+            
+
+          user.Bio = "";
+            await _dbContext.SaveChangesAsync();
+            return Ok();
+
+        }
+
+
+
+
 
 
     }
