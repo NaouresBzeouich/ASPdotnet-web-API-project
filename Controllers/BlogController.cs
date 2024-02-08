@@ -1,12 +1,8 @@
-﻿using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Project_back_end.Data;
 using Project_back_end.Models;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.AspNetCore.Mvc.RazorPages;
-using Microsoft.DotNet.Scaffolding.Shared.Messaging;
-using System;
-using System.Data.SqlTypes;
+using Microsoft.AspNetCore.Authorization;
 
 namespace Project_back_end.Controllers
 {
@@ -126,7 +122,7 @@ namespace Project_back_end.Controllers
         // post(add) a new blog
         [HttpPost]
         [Route("/createBlog")]
-
+        [Authorize(Roles = "admin,user")]
         public async Task<IActionResult> Create([FromBody] CreateBlogRequest newBlog)
         {
             // _logger.LogInformation("inside the action !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
@@ -180,6 +176,7 @@ namespace Project_back_end.Controllers
         // delete a blog by its id 
         [HttpPost]
         [Route("/deleteBlog")]
+        [Authorize(Roles = "admin,user")]
         public async Task<IActionResult> Delete(@string id)
         {
             Guid guidId = Guid.Parse(id.name);
@@ -222,6 +219,7 @@ namespace Project_back_end.Controllers
         // update the blog by its id 
         [HttpPut]
         [Route("/updateBlog/{id}")]
+        [Authorize(Roles = "admin,user")]
         public async Task<Blog> UpdateBlog([FromRoute] Guid id, UpdateBlogRequest updatedBlog)
         {
             var blog = await _DbBlogsContext.Blogs.FindAsync(id);
@@ -263,6 +261,7 @@ namespace Project_back_end.Controllers
 
         [HttpPut]
         [Route("/likeBlog")]
+        [Authorize(Roles = "admin,user")]
         public async Task<IActionResult> likeBlog([FromBody] LikingRequest likeRequest)
         {
             Guid blogId = Guid.Parse(likeRequest.EntityId);
@@ -278,7 +277,7 @@ namespace Project_back_end.Controllers
 
 
             var like = await _DbBlogsContext.BlogLikes.FirstOrDefaultAsync(x => x.BlogId == blogId
-            && x.UserId== UserId);
+            && x.UserId == UserId);
 
             if (like == null)
             {
@@ -322,61 +321,62 @@ namespace Project_back_end.Controllers
 
         [HttpPut]
         [Route("/dislikeBlog")]
+        [Authorize(Roles = "admin,user")]
         public async Task<IActionResult> dislikeBlog([FromBody] LikingRequest likeRequest)
         {
-           
-                Guid blogId = Guid.Parse(likeRequest.EntityId);
-                Guid UserId = Guid.Parse(likeRequest.UserId);
+
+            Guid blogId = Guid.Parse(likeRequest.EntityId);
+            Guid UserId = Guid.Parse(likeRequest.UserId);
 
 
-                var blog = await _DbBlogsContext.Blogs.FindAsync(blogId);
+            var blog = await _DbBlogsContext.Blogs.FindAsync(blogId);
 
-                if (blog == null)
+            if (blog == null)
+            {
+                return NotFound();
+            }
+
+
+            var dislike = await _DbBlogsContext.BlogDislikes.FirstOrDefaultAsync(x => x.BlogId == blogId
+            && x.UserId == UserId);
+
+            if (dislike == null)
+            {
+                var BlogDislike = new BlogDislikes()
                 {
-                    return NotFound();
-                }
+                    BlogId = blogId,
+                    UserId = UserId,
+                };
+                await _DbBlogsContext.BlogDislikes.AddAsync(BlogDislike);
+
+                blog.Dislikes++;
 
 
-                var dislike = await _DbBlogsContext.BlogDislikes.FirstOrDefaultAsync(x => x.BlogId == blogId
-                && x.UserId == UserId);
+                await _DbBlogsContext.SaveChangesAsync();
 
-                if (dislike == null)
+                return Ok(new
                 {
-                    var BlogDislike = new BlogDislikes()
-                    {
-                        BlogId = blogId,
-                        UserId = UserId,
-                    };
-                    await _DbBlogsContext.BlogDislikes.AddAsync(BlogDislike);
+                    Message = "dislike"
+                });
+            }
+            else
+            {
 
-                    blog.Dislikes++;
+                _DbBlogsContext.BlogDislikes.Remove(dislike);
+                blog.Dislikes--;
 
+                await _DbBlogsContext.SaveChangesAsync();
 
-                    await _DbBlogsContext.SaveChangesAsync();
-
-                    return Ok(new
-                    {
-                        Message = "dislike"
-                    });
-                }
-                else
+                return Ok(new
                 {
-
-                    _DbBlogsContext.BlogDislikes.Remove(dislike);
-                    blog.Dislikes--;
-
-                    await _DbBlogsContext.SaveChangesAsync();
-
-                    return Ok(new
-                    {
-                        Message = "undislike "
-                    });
-
-                }
-
-
+                    Message = "undislike "
+                });
 
             }
+
+
+
+        }
 
 
 
@@ -404,8 +404,8 @@ namespace Project_back_end.Controllers
 
             return Ok(new
             {
-likes=(like!=null),
-dislikes=(dislike!=null),
+                likes = (like != null),
+                dislikes = (dislike != null),
 
             });
 
