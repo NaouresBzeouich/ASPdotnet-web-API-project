@@ -83,9 +83,7 @@ namespace Project_back_end.Controllers
             //_logger.LogInformation(guid);
 
 
-            //   var blog = await _DbBlogsContext.Blogs.FindAsync(guid);
-            var blogs = await _DbBlogsContext.Blogs.Where(x => x.UserId == id.name).ToListAsync();
-
+              var blogs = await _DbBlogsContext.Blogs.Where(x => x.UserId == id.name).OrderByDescending(blog => blog.CreationDate).ToListAsync();
 
             // si le blog Id n'existe pas
             if (blogs == null)
@@ -140,6 +138,7 @@ namespace Project_back_end.Controllers
                     Title = newBlog.Title,
                     CategorieId = newBlog.CategoryId,
                     UserId = newBlog.UserId,
+                    CreationDate=DateTime.Now
                     // User = user
                 };
                 await _DbBlogsContext.Blogs.AddAsync(Blog);
