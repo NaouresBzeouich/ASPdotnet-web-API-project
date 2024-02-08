@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Identity;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Project_back_end.Data;
@@ -32,19 +33,18 @@ namespace Project_back_end.Controllers
             return Ok(users);
         }
 
+        [HttpGet("getUserById/{id}")]
+        public async Task<IActionResult> GetUserById(string id)
+        {
+            var user = await _userManager.FindByIdAsync(id);
 
-      [HttpGet("getUserById/{id}")]
- public async Task<IActionResult> GetUserById(   string id )
- {
-   var user = await _userManager.FindByIdAsync(id);
+            if (user != null)
+            {
+                return Ok(user);
+            }
 
-     if (user != null)
-     {
-         return Ok(user);
-     }
-
-     return NotFound(); // User with the given ID not found
- }
+            return NotFound(); // User with the given ID not found
+        }
 
 
         [HttpPost("getUserCounts")]
@@ -62,10 +62,6 @@ namespace Project_back_end.Controllers
             var blogs = await _dbContext.Blogs.Where(x => x.UserId == id.name).ToListAsync();
             var blogsCounts = blogs.Count();
             int totalLikes = (int)blogs.Sum(blog => blog.Likes);
-
-
-
-
 
             return Ok(new
             {
@@ -115,6 +111,7 @@ namespace Project_back_end.Controllers
 
 
         [HttpPut("/updateUser/{id}")]
+        [Authorize(Roles = "admin,user")]
         public async Task<IActionResult> UpdateUser(string id, [FromBody] User updatedUser)
         {
             var existingUser = await _userManager.FindByIdAsync(id);
@@ -140,8 +137,8 @@ namespace Project_back_end.Controllers
                 if (updatedUser.AccessFailedCount != null)
                     existingUser.AccessFailedCount = updatedUser.AccessFailedCount;
 
-                //  if (updatedUser.Bio != null)
-                //     existingUser.Bio = updatedUser.Bio;
+                if (updatedUser.Bio != null)
+                    existingUser.Bio = updatedUser.Bio;
 
 
                 var result = await _userManager.UpdateAsync(existingUser);
@@ -157,6 +154,7 @@ namespace Project_back_end.Controllers
 
 
         [HttpDelete("{id}")]
+        [Authorize(Roles = "admin,user")]
         public async Task<IActionResult> DeleteUser(string id)
         {
             var user = await _userManager.FindByIdAsync(id);
@@ -307,7 +305,7 @@ namespace Project_back_end.Controllers
         }
 
 
-        // this action to let the attribue image in blog  an URL 
+
         [NonAction]
         private string getImageByUser(Guid userId)
         {
@@ -336,12 +334,12 @@ namespace Project_back_end.Controllers
 
             var user = await _userManager.FindByIdAsync(id);
             if (user == null)
-            
+
                 return NotFound(); // User with the given ID not found
 
-            
 
-          user.Bio = "";
+
+            user.Bio = "";
             await _dbContext.SaveChangesAsync();
             return Ok();
 
