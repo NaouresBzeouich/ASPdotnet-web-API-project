@@ -8,6 +8,7 @@ using System.Security.Claims;
 using System.Text;
 using Project_back_end.JwtBearerConfig;
 using Project_back_end.Models;
+using Microsoft.Extensions.Logging;
 
 namespace Project_back_end.Controllers
 {
@@ -15,10 +16,16 @@ namespace Project_back_end.Controllers
     {
         private readonly JwtBearerTokenSettings jwtBearerTokenSettings;
         private readonly UserManager<User> userManager;
-        public AuthController(IOptions<JwtBearerTokenSettings> jwtTokenOptions, UserManager<User> userManager)
+        private readonly RoleManager<IdentityRole> roleManager;
+        private readonly ILogger<BlogController> _logger;
+
+
+        public AuthController(IOptions<JwtBearerTokenSettings> jwtTokenOptions, ILogger<BlogController> logger, UserManager<User> userManager)
         {
             this.jwtBearerTokenSettings = jwtTokenOptions.Value;
             this.userManager = userManager;
+            this._logger = logger;
+
         }
 
 
@@ -26,6 +33,7 @@ namespace Project_back_end.Controllers
         [Route("api/Register")]
         public async Task<IActionResult> Register([FromBody] RegisterCredentials userDetails)
         {
+            _logger.LogError("HHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHH",userDetails.ToString());
             if (!ModelState.IsValid || userDetails == null)
             {
                 return new BadRequestObjectResult(new
@@ -34,13 +42,15 @@ namespace Project_back_end.Controllers
                     Message = "User Registration Failed"
                 });
             }
+            
             var identityUser = new User()
             {
                 UserName = userDetails.username,
-                Email = userDetails.Email,
-                Bio = userDetails.Bio ?? ""
+                Email = userDetails.email
+             //   Bio = userDetails.Bio ?? ""
             };
-            var result = await userManager.CreateAsync(identityUser, userDetails.Password);
+            var result = await userManager.CreateAsync(identityUser, userDetails.password);
+            var result2= (await userManager.AddToRoleAsync(identityUser, "user"));
             if (!result.Succeeded)
             {
                 var dictionary = new ModelStateDictionary();

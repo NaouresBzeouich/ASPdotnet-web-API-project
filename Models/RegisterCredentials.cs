@@ -7,9 +7,9 @@ namespace Project_back_end.Models
         [Required]
         public string username { get; set; }
         [Required]
-        public string Password { get; set; }
+        public string password { get; set; }
         [Required]
-        public string Email { get; set; }
-        public string? Bio { get; set; }
+        public string email { get; set; }
+      //  public string? Bio { get; set; }
     }
 }
