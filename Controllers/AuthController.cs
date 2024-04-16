@@ -9,6 +9,7 @@ using System.Text;
 using Project_back_end.JwtBearerConfig;
 using Project_back_end.Models;
 using Microsoft.Extensions.Logging;
+using System.Collections.Generic;
 
 namespace Project_back_end.Controllers
 {
@@ -33,8 +34,8 @@ namespace Project_back_end.Controllers
         [Route("api/Register")]
         public async Task<IActionResult> Register([FromBody] RegisterCredentials userDetails)
         {
-            _logger.LogError("HHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHH",userDetails.ToString());
-            if (!ModelState.IsValid || userDetails == null)
+            
+            if (!ModelState.IsValid || userDetails == null )
             {
                 return new BadRequestObjectResult(new
                 {
@@ -49,8 +50,19 @@ namespace Project_back_end.Controllers
                 Email = userDetails.email
              //   Bio = userDetails.Bio ?? ""
             };
+            var existingUser=await userManager.FindByNameAsync(identityUser.UserName);
+            if(existingUser!=null)
+            {
+                return BadRequest(new
+                {
+                    StatusCode = 406,
+                    Message = "Wrong credentials,Username already exists",
+                   
+                });
+
+            }
             var result = await userManager.CreateAsync(identityUser, userDetails.password);
-            var result2= (await userManager.AddToRoleAsync(identityUser, "user"));
+        //    var result2= (await userManager.AddToRoleAsync(identityUser, "user"));
             if (!result.Succeeded)
             {
                 var dictionary = new ModelStateDictionary();
@@ -58,13 +70,15 @@ namespace Project_back_end.Controllers
 
                 {
                     dictionary.AddModelError(error.Code, error.Description);
+                    //_logger.LogCritical(error.Code + error.Description);
                 }
-                return new BadRequestObjectResult(new
+                return BadRequest (new
                 {
-                    Message = "User Registration Failed",
+                    StatusCode = 406,
+                    Message = "wrong password format",
                     Errors =
                 dictionary
-                });
+                }) ;
             }
             return Ok(new { Message = "User Reigstration Successful" });
         }

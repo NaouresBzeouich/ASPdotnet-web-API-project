@@ -111,7 +111,7 @@ namespace Project_back_end.Controllers
 
 
         [HttpPut("/updateUser/{id}")]
-        [Authorize(Roles = "admin,user")]
+      //  [Authorize(Roles = "admin,user")]
         public async Task<IActionResult> UpdateUser(string id, [FromBody] User updatedUser)
         {
             var existingUser = await _userManager.FindByIdAsync(id);
@@ -154,7 +154,7 @@ namespace Project_back_end.Controllers
 
 
         [HttpDelete("{id}")]
-        [Authorize(Roles = "admin,user")]
+      //  [Authorize(Roles = "admin,user")]
         public async Task<IActionResult> DeleteUser(string id)
         {
             var user = await _userManager.FindByIdAsync(id);

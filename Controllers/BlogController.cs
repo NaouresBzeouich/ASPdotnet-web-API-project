@@ -24,7 +24,6 @@ namespace Project_back_end.Controllers
         }
 
 
-        // gets all the blogs 
         [HttpGet]
         [Route("/getBlogs")]
         public async Task<IEnumerable<Blog>> GetBlogs()
@@ -47,7 +46,6 @@ namespace Project_back_end.Controllers
             }
         }
 
-        // gets a blog with its id     
         [HttpPost]
         [Route("/getBlog")]
         public async Task<IActionResult> GetBlog([FromBody] @string id)
@@ -83,7 +81,7 @@ namespace Project_back_end.Controllers
             //_logger.LogInformation(guid);
 
 
-              var blogs = await _DbBlogsContext.Blogs.Where(x => x.UserId == id.name).OrderByDescending(blog => blog.CreationDate).ToListAsync();
+            var blogs = await _DbBlogsContext.Blogs.Where(x => x.UserId == id.name).OrderByDescending(blog => blog.CreationDate).ToListAsync();
 
             // si le blog Id n'existe pas
             if (blogs == null)
@@ -112,18 +110,17 @@ namespace Project_back_end.Controllers
         [Route("/getTrendingBlogs")]
         public async Task<IEnumerable<Blog>> getTrendingBlogs()
         {
-            IEnumerable<Blog> blogs = await _DbBlogsContext.Blogs.OrderByDescending(blog => blog.Likes).Take(10).ToListAsync();
+            IEnumerable<Blog> blogs = await _DbBlogsContext.Blogs.OrderByDescending(blog => blog.Views).Take(10).ToListAsync();
             return blogs;
 
         }
 
-        // post(add) a new blog
         [HttpPost]
         [Route("/createBlog")]
-        [Authorize(Roles = "admin,user")]
+        //   [Authorize(Roles = "admin,user")]
         public async Task<IActionResult> Create([FromBody] CreateBlogRequest newBlog)
         {
-            // _logger.LogInformation("inside the action !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
+            // _logger.LogInformation("inside the action");
             string guidString = newBlog.UserId?.ToString();
             Guid guidid = Guid.Parse(newBlog.UserId);
 
@@ -138,7 +135,7 @@ namespace Project_back_end.Controllers
                     Title = newBlog.Title,
                     CategorieId = newBlog.CategoryId,
                     UserId = newBlog.UserId,
-                    CreationDate=DateTime.Now
+                    CreationDate = DateTime.Now
                     // User = user
                 };
                 await _DbBlogsContext.Blogs.AddAsync(Blog);
@@ -175,7 +172,7 @@ namespace Project_back_end.Controllers
         // delete a blog by its id 
         [HttpPost]
         [Route("/deleteBlog")]
-        [Authorize(Roles = "admin,user")]
+        //   [Authorize(Roles = "admin,user")]
         public async Task<IActionResult> Delete(@string id)
         {
             Guid guidId = Guid.Parse(id.name);
@@ -201,7 +198,6 @@ namespace Project_back_end.Controllers
             Guid guidId = Guid.Parse(id.name);
             var blog = await _DbBlogsContext.Blogs.FindAsync(guidId);
 
-            // si le blog Id n'existe pas
             if (blog == null)
             {
                 return NotFound(); // mbe3id bech inredirectiha lel api necessary 
@@ -215,18 +211,16 @@ namespace Project_back_end.Controllers
         }
 
 
-        // update the blog by its id 
         [HttpPut]
         [Route("/updateBlog/{id}")]
-        [Authorize(Roles = "admin,user")]
+        //  [Authorize(Roles = "admin,user")]
         public async Task<Blog> UpdateBlog([FromRoute] Guid id, UpdateBlogRequest updatedBlog)
         {
             var blog = await _DbBlogsContext.Blogs.FindAsync(id);
 
-            // si le blog Id n'existe pas
             if (blog == null)
             {
-                return null; // mbe3id netfehmou   
+                return null;
             }
 
 
@@ -260,7 +254,7 @@ namespace Project_back_end.Controllers
 
         [HttpPut]
         [Route("/likeBlog")]
-        [Authorize(Roles = "admin,user")]
+        //    [Authorize(Roles = "admin,user")]
         public async Task<IActionResult> likeBlog([FromBody] LikingRequest likeRequest)
         {
             Guid blogId = Guid.Parse(likeRequest.EntityId);
@@ -284,7 +278,6 @@ namespace Project_back_end.Controllers
                 {
                     BlogId = blogId,
                     UserId = UserId,
-                    // User = user
                 };
                 await _DbBlogsContext.BlogLikes.AddAsync(BlogLike);
 
@@ -320,7 +313,7 @@ namespace Project_back_end.Controllers
 
         [HttpPut]
         [Route("/dislikeBlog")]
-        [Authorize(Roles = "admin,user")]
+        //   [Authorize(Roles = "admin,user")]
         public async Task<IActionResult> dislikeBlog([FromBody] LikingRequest likeRequest)
         {
 
@@ -450,9 +443,7 @@ namespace Project_back_end.Controllers
 
 
 
-        // image management : 
-
-        // upload a image (you can use it when creating the blog or when you wanna update the image 
+       
         [HttpPost]
         [Route("ImageUpload")]
         public async Task<IActionResult> ImageUpload([FromForm] ImageModel imageModel)
